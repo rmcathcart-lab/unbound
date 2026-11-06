@@ -21,8 +21,8 @@ var Overworld = (function () {
   var THEMES = {
     T0: null, // the tutorial (The Proving Grounds) borrows the Barrow Marches, set below
     L1: { name: 'marsh', ground: ['#2b3a2b', '#263426'], path: '#4a4030', wall: 'tree-dead', water: '#1b2b3a', deco: ['grave', 'bones', 'reed'], wallDensity: 0.30, waterDensity: 0.07 },
-    L2: { name: 'volcano', ground: ['#3a2a24', '#33241f'], path: '#5a4a3a', wall: 'rock', water: '#c84a1e', deco: ['ember', 'bones', 'rock-small'], wallDensity: 0.32, waterDensity: 0.08, lava: true },
-    L3: { name: 'forest', ground: ['#243a22', '#1f331e'], path: '#4a3c2a', wall: 'tree', water: '#1f3340', deco: ['mushroom', 'stump', 'fern'], wallDensity: 0.38, waterDensity: 0.04 },
+    L2: { name: 'salt', ground: ['#5a5650', '#524e48'], path: '#6a6458', wall: 'rock', water: '#2a3a40', deco: ['bones', 'rock-small'], wallDensity: 0.30, waterDensity: 0.06 },
+    L3: { name: 'quarry', ground: ['#3e3a34', '#38342f'], path: '#5a5246', wall: 'rock', water: '#1f2a30', deco: ['rock-small', 'bones'], wallDensity: 0.34, waterDensity: 0.03 },
     L4: { name: 'crypt', ground: ['#2d2a2e', '#282529'], path: '#3a3438', wall: 'wall', water: '#101018', deco: ['bones', 'coffin', 'skull'], wallDensity: 0.34, waterDensity: 0.03, indoor: true },
     L5: { name: 'fen', ground: ['#243036', '#1f2a30'], path: '#4a4a3a', wall: 'tree-dead', water: '#1b3340', deco: ['reed', 'bones'], wallDensity: 0.3, waterDensity: 0.12 },
     L6: { name: 'coast', ground: ['#2a3034', '#252b2f'], path: '#5a5648', wall: 'rock', water: '#1a3a4a', deco: ['bones', 'rock-small'], wallDensity: 0.32, waterDensity: 0.14 },

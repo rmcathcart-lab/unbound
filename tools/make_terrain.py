@@ -1,5 +1,5 @@
 """Build a land's painted terrain set from four generated textures + a prop sheet (Canva), in the format pack_terrain.py writes.
-   usage: python3 tools/make_terrain.py <land N> <label> <ground.png> <thicket.png> <path.png> <liquid.png> <props.png> "<prop labels, | separated>"
+   usage: python3 tools/make_terrain.py <land N> <label> <ground.png> <thicket.png> <path.png> <liquid.png> <props.png> "<prop labels, | separated>" [ground,thicket,path,liquid brightness] [their crop sizes]
    out: src/art/tr-l<N>.webp (24 x 64-px tiles: 4 ground, path, 3 liquid frames, 16 thicket edges by N=1|E=2|S=4|W=8 mask),
         src/art/tr-l<N>-props.webp, and the L<N> entry of src/terrain_defs.js (other lands kept)."""
 import sys, io, json, os
@@ -7,6 +7,8 @@ import numpy as np
 from PIL import Image, ImageFilter, ImageEnhance
 from scipy import ndimage as ndi
 N, LABEL, GROUND, THICK, PATH, LIQ, PROPS, PLABELS = sys.argv[1], sys.argv[2], *sys.argv[3:8], sys.argv[8].split('|')
+BR = [float(v) for v in sys.argv[9].split(',')] if len(sys.argv) > 9 else [1.15, 1.9, 1.1, 1.15]   # optional brightness: ground,thicket,path,liquid
+CR = [int(v) for v in sys.argv[10].split(',')] if len(sys.argv) > 10 else [300, 260, 300, 360]        # optional texture crops (bigger = finer grain)
 T = 64; rng = np.random.default_rng(int(N) * 7919)
 
 def seamless(path, crop=520, out=T * 4, bright=1.0):
@@ -25,7 +27,7 @@ def tiles_from(sm, n, rot=True):
     for i in range(n): out.append(base.rotate(90 * (i % 4)) if rot else base)
     return out
 
-ground = seamless(GROUND, crop=300, bright=1.15); thick = seamless(THICK, crop=260, bright=1.9); path = seamless(PATH, crop=300, bright=1.1); liq = seamless(LIQ, crop=360, bright=1.15)
+ground = seamless(GROUND, crop=CR[0], bright=BR[0]); thick = seamless(THICK, crop=CR[1], bright=BR[1]); path = seamless(PATH, crop=CR[2], bright=BR[2]); liq = seamless(LIQ, crop=CR[3], bright=BR[3])
 G = tiles_from(ground, 4)
 P = tiles_from(path, 1)[0]
 lq = liq.resize((T, T), Image.LANCZOS); L = []
@@ -63,7 +65,7 @@ rgb = np.clip((A - bg * (1 - np.maximum(alpha, 1e-3)[..., None])) / np.maximum(a
 rgba = np.dstack([rgb, alpha * 255]).astype(np.uint8)
 lab, n = ndi.label(ndi.binary_dilation(alpha > 0.16, iterations=6)); sizes = ndi.sum(alpha > 0.16, lab, range(1, n + 1))
 big = sorted([k + 1 for k in range(n) if sizes[k] > 3000], key=lambda k: (round(ndi.center_of_mass(lab == k)[0] / 300), ndi.center_of_mass(lab == k)[1]))
-BIG = ('tree', 'scarecrow', 'stump', 'windmill'); SMALL = ('fence', 'bucket', 'sheaf', 'skull'); FLAT = ('millstone', 'sheaf', 'skull')
+BIG = ('tree', 'scarecrow', 'stump', 'windmill', 'spire', 'crane', 'column', 'ladder'); SMALL = ('fence', 'bucket', 'sheaf', 'skull', 'pickaxe', 'anchor', 'bush'); FLAT = ('millstone', 'sheaf', 'skull', 'rubble')
 items = []
 for i, k in enumerate(big[:len(PLABELS)]):
     m = lab == k; ys, xs = np.where(m); x0, x1, y0, y1 = xs.min(), xs.max() + 1, ys.min(), ys.max() + 1

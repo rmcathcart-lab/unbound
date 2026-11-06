@@ -184,6 +184,112 @@ var LOREBOOK = (function () {
         { h: 'Ordering without a calculator' },
         { p: 'Turn every mixed radical into an entire radical, then compare the numbers under the roots: \\(3\\sqrt{3} = \\sqrt{27}\\), \\(2\\sqrt{5} = \\sqrt{20}\\), \\(4\\sqrt{2} = \\sqrt{32}\\), so \\(2\\sqrt{5} < 3\\sqrt{3} < 4\\sqrt{2}\\).' }
       ] }
+  ],
+  L2: [
+    { title: 'What the Mites Carry', lore: 'A Salt Mite carries its grains in stacks, and it never counts them one by one. Two stacks of the same grain, laid end to end, make one taller stack; the heights simply add. Take a stack away and the heights subtract. The caravans learned this from the mites, and the caravans got rich.',
+      math: [
+        { h: 'Same base: add or subtract the exponents' },
+        { rule: 'x^{a}\\cdot x^{b} = x^{a+b} \\qquad \\dfrac{x^{a}}{x^{b}} = x^{a-b}' },
+        { steps: ['3^{4}\\cdot 3^{2} = 3^{6} = 729', '\\dfrac{x^{9}}{x^{3}} = x^{6}', '2a^{3}\\cdot 5a^{4} = (2\\cdot 5)\\,a^{3+4} = 10a^{7}'] },
+        { p: 'Multiply (or divide) the <b>numbers in front</b> as usual. Only the <b>exponents</b> of matching bases add (or subtract).' },
+        { h: 'The laws at a glance' },
+        { cols: LAWS.map(function (r) { return [r[0], r[1] + ' &nbsp; e.g. ' + r[2]]; }) },
+        { p: 'Different bases never combine: \\(x^{3}\\cdot y^{2}\\) stays as it is.' }
+      ] },
+    { title: 'The Colossus, Stacked', lore: 'The Salt Colossus is a stack of stacks. Each block of it is a block of blocks, raised to its own power again and again, until the whole thing towers over the flats. Knock the brackets off it in the right order and it comes down to a single grain.',
+      math: [
+        { h: 'A power of a power: multiply the exponents' },
+        { rule: '(x^{a})^{b} = x^{ab} \\qquad (xy)^{a} = x^{a}y^{a}' },
+        { steps: ['(3a^{3})^{2} = 3^{2}\\,a^{3\\times 2} = 9a^{6}', '(3a^{3})^{2}\\cdot 2a^{2} = 9a^{6}\\cdot 2a^{2} = 18a^{8}', '\\dfrac{(4x^{3})^{2}}{2x^{4}} = \\dfrac{16x^{6}}{2x^{4}} = 8x^{2}'] },
+        { p: 'Every factor inside the brackets gets the power, the number in front too: \\((3a^{3})^{2}\\) is \\(9a^{6}\\), not \\(3a^{6}\\).' },
+        { h: 'Watch the negative' },
+        { cols: [['\\((-7)^{2}\\)', 'the base is \\(-7\\): \\((-7)(-7) = 49\\)'], ['\\(-7^{2}\\)', 'the base is 7, the negative waits outside: \\(-(7\\cdot 7) = -49\\)']] },
+        { h: 'Order of work' },
+        { p: 'Brackets and powers first, then multiply, then divide. Keep the numbers and each letter in their own lane.' }
+      ] },
+    { title: 'Halora\'s Mirror', lore: 'The Brine Queen keeps a mirror of polished salt. Anything with a negative mark that looks into it is flipped to the other side of the glass, and its mark turns positive. Anything raised to nothing at all sees only a single grain looking back: one.',
+      math: [
+        { h: 'Zero exponents' },
+        { rule: 'x^{0} = 1 \\quad (x \\neq 0)' },
+        { p: 'Divide anything by itself: \\(\\dfrac{x^{5}}{x^{5}} = x^{0}\\), and it is also 1. So \\(7^{0} = 1\\), \\((-5x)^{0} = 1\\), but \\(-5x^{0} = -5\\), since only the \\(x\\) has the zero.' },
+        { h: 'Negative exponents: flip it' },
+        { fig: flip() },
+        { rule: 'x^{-n} = \\dfrac{1}{x^{n}} \\qquad \\dfrac{1}{x^{-n}} = x^{n} \\qquad \\left(\\dfrac{a}{b}\\right)^{-n} = \\left(\\dfrac{b}{a}\\right)^{n}' },
+        { steps: ['2^{-3} = \\dfrac{1}{2^{3}} = \\dfrac{1}{8}', '\\left(\\dfrac{2}{3}\\right)^{-2} = \\left(\\dfrac{3}{2}\\right)^{2} = \\dfrac{9}{4}', '\\dfrac{6x^{2}}{3x^{5}} = 2x^{-3} = \\dfrac{2}{x^{3}}'] },
+        { p: 'Only the base that wears the negative exponent moves. In \\(2x^{-3}\\) the 2 stays on top.' }
+      ] },
+    { title: 'Grains Beyond Counting', lore: 'There are more grains of salt in the Wastes than there are words in every book ever written. The Glass Scarabs, who keep the tallies, gave up writing all the zeros long ago. They write a small number and a power of ten, and they have never once run out of shell.',
+      math: [
+        { h: 'Scientific notation' },
+        { rule: 'a \\times 10^{n}, \\qquad 1 \\le a < 10' },
+        { fig: shift('4500000.', 6, 'left', '4.5 × 10⁶') },
+        { cols: [['Big number', 'the point moves <b>left</b>, the exponent is <b>positive</b>: \\(4\\,500\\,000 = 4.5\\times 10^{6}\\)'], ['Small number', 'the point moves <b>right</b>, the exponent is <b>negative</b>: \\(0.00032 = 3.2\\times 10^{-4}\\)']] },
+        { h: 'Multiplying and dividing' },
+        { steps: ['(3\\times 10^{5})(4\\times 10^{-2}) = 12\\times 10^{3} = 1.2\\times 10^{4}', '\\dfrac{6\\times 10^{8}}{2\\times 10^{3}} = 3\\times 10^{5}'] },
+        { p: 'Work the numbers in front, then the powers of ten with the exponent laws. If the number in front is no longer between 1 and 10, shift it and adjust the exponent.' }
+      ] },
+    { title: 'The Mirage, Halved', lore: 'The Mirage Wraith is never all there. It shows you half of itself, or a third, or two thirds of a thing that was never whole. The trick is to find the root of it first, then raise what is left. The Brine Serpent knows the trick, and it is not telling.',
+      math: [
+        { h: 'Rational exponents are roots' },
+        { rule: 'x^{\\frac{1}{n}} = \\sqrt[n]{x} \\qquad x^{\\frac{m}{n}} = \\left(\\sqrt[n]{x}\\right)^{m} = \\sqrt[n]{x^{m}}' },
+        { p: 'The <b>bottom</b> of the fraction is the root. The <b>top</b> is the power.' },
+        { steps: ['49^{\\frac{1}{2}} = \\sqrt{49} = 7', '8^{\\frac{2}{3}} = \\left(\\sqrt[3]{8}\\right)^{2} = 2^{2} = 4', '(-125)^{-\\frac{2}{3}} = \\dfrac{1}{\\left(\\sqrt[3]{-125}\\right)^{2}} = \\dfrac{1}{(-5)^{2}} = \\dfrac{1}{25}'] },
+        { p: 'Take the root first; the numbers stay small. A negative exponent still means flip.' },
+        { h: 'Radical ↔ power' },
+        { cols: [['\\(\\sqrt[5]{x^{3}}\\)', '\\(x^{\\frac{3}{5}}\\)'], ['\\(x^{\\frac{3}{4}}\\)', '\\(\\sqrt[4]{x^{3}}\\) or \\(\\left(\\sqrt[4]{x}\\right)^{3}\\)']] },
+        { p: 'All the exponent laws still work with fractions: \\(x^{\\frac{1}{2}}\\cdot x^{\\frac{1}{3}} = x^{\\frac{5}{6}}\\).' }
+      ] }
+  ],
+  L3: [
+    { title: 'Mason\'s Marks', lore: 'Every block cut from the Deep Quarry carries a mason\'s mark: a number in front, a letter, a small number high on the right. The Chiplings cannot read, but they can count the marks on a block, and they know the biggest little number tells you how tall a wall it belongs in.',
+      math: [
+        { h: 'The parts of a polynomial' },
+        { fig: anatomy() },
+        { cols: [['Term', 'a number, a variable, or a product of them: \\(3x^{2}\\), \\(-7x\\), \\(2\\)'], ['Degree', 'the highest exponent of the variable (a constant has degree 0)'], ['Leading coefficient', 'the number in front of the highest-degree term'], ['Constant term', 'the term with no variable']] },
+        { h: 'Names by number of terms' },
+        { cols: [['1 term', 'monomial: \\(5x^{3}\\)'], ['2 terms', 'binomial: \\(x - 4\\)'], ['3 terms', 'trinomial: \\(2x^{2} + x - 9\\)'], ['more', 'polynomial']] },
+        { p: 'Write a polynomial in <b>descending order</b>, highest exponent first. Then the leading coefficient is simply the first number.' }
+      ] },
+    { title: 'Sorting the Rubble', lore: 'The rubble at the bottom of the pit is sorted by hand: blocks with blocks, slabs with slabs, chips with chips. You may stack blocks onto blocks all day, but a slab never goes on the block pile. Old Moraine fines anyone who mixes them.',
+      math: [
+        { h: 'Like terms' },
+        { p: 'Like terms have the <b>same variables with the same exponents</b>. Only like terms combine, and only their coefficients add.' },
+        { cols: [['Like', '\\(4x^{2}\\) and \\(-x^{2}\\) → \\(3x^{2}\\); &nbsp; \\(2xy\\) and \\(5xy\\) → \\(7xy\\)'], ['Not like', '\\(4x^{2}\\) and \\(4x\\); &nbsp; \\(xy^{2}\\) and \\(x^{2}y\\)']] },
+        { h: 'Adding' },
+        { steps: ['(3x^{2} - 2x + 5) + (x^{2} + 6x - 8)', '= (3 + 1)x^{2} + (-2 + 6)x + (5 - 8)', '= 4x^{2} + 4x - 3'] },
+        { h: 'Subtracting: the minus hits every term' },
+        { steps: ['(5x^{2} + x - 4) - (2x^{2} - 3x + 1)', '= 5x^{2} + x - 4 - 2x^{2} + 3x - 1', '= 3x^{2} + 4x - 5'] },
+        { p: 'The most common slip: forgetting to change the sign of the <b>last</b> terms in the second bracket.' }
+      ] },
+    { title: 'The Wight\'s Long Arm', lore: 'The Mason Wight has one arm far longer than the other, and it uses it to reach every block in a row without stepping once. It touches each block in turn and leaves its mark on all of them. Miss one and the whole row falls.',
+      math: [
+        { h: 'A monomial times a polynomial: distribute' },
+        { rule: 'a(b + c + d) = ab + ac + ad' },
+        { steps: ['3x(2x - 5) = 6x^{2} - 15x', '-2x(x^{2} - 4x + 3) = -2x^{3} + 8x^{2} - 6x', '2x(x + 4) - 3(x - 1) = 2x^{2} + 8x - 3x + 3 = 2x^{2} + 5x + 3'] },
+        { p: 'Multiply the coefficients, add the exponents (\\(x\\cdot x^{2} = x^{3}\\)), and carry the sign onto every term. Distribute first, then collect like terms.' },
+        { fig: areaModel(['3x'], ['2x', '−5'], [['6x²', '−15x']], '3x(2x − 5) = 6x² − 15x') }
+      ] },
+    { title: 'Twinwing', lore: 'The Twinwing Bats hunt in pairs, and each bat in a pair strikes each of the other pair. Two against two makes four strikes, every time. Count them in the dark by the sound: first, outside, inside, last.',
+      math: [
+        { h: 'A binomial times a binomial' },
+        { p: 'Every term in the first bracket multiplies every term in the second. Two terms by two terms gives four products: <b>F</b>irst, <b>O</b>utside, <b>I</b>nside, <b>L</b>ast.' },
+        { fig: areaModel(['x', '+3'], ['2x', '−5'], [['2x²', '−5x'], ['6x', '−15']], '(x + 3)(2x − 5) = 2x² + x − 15') },
+        { steps: ['(x + 3)(2x - 5) = 2x^{2} - 5x + 6x - 15', '= 2x^{2} + x - 15'] },
+        { h: 'Area' },
+        { p: 'A rectangle that is \\((x + 4)\\) by \\((x - 2)\\) has area \\((x + 4)(x - 2) = x^{2} + 2x - 8\\). The area model is the same picture, drawn with the real sides.' }
+      ] },
+    { title: 'The Hydra\'s Heads', lore: 'Cut one head from the Stone Hydra and two grow back, and each of those strikes all three of yours. But some heads come in mirrored pairs, and when the mirrored pair meets, the middle cancels out and leaves only stone. Old Moraine says that is the only way it has ever been killed.',
+      math: [
+        { h: 'Special products' },
+        { rule: '(a + b)(a - b) = a^{2} - b^{2}' },
+        { fig: diffSquares() },
+        { p: 'The middle terms \\(+ab\\) and \\(-ab\\) cancel: \\((x + 6)(x - 6) = x^{2} - 36\\).' },
+        { rule: '(a + b)^{2} = a^{2} + 2ab + b^{2} \\qquad (a - b)^{2} = a^{2} - 2ab + b^{2}' },
+        { p: '\\((2x - 3)^{2} = 4x^{2} - 12x + 9\\). Not \\(4x^{2} + 9\\): squaring a binomial always makes a middle term.' },
+        { h: 'A binomial times a trinomial' },
+        { steps: ['(x + 2)(x^{2} - 3x + 4)', '= x^{3} - 3x^{2} + 4x + 2x^{2} - 6x + 8', '= x^{3} - x^{2} - 2x + 8'] },
+        { p: 'Two terms by three terms makes six products before you collect. Count them to be sure none got away.' }
+      ] }
   ]
   };
 })();

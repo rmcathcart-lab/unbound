@@ -171,7 +171,7 @@
   };
 
   /* ---------- painted terrain per land (tools/pack_terrain.py) ---------- */
-  var TSET = { marsh: 'L1', volcano: 'L2', forest: 'L3', crypt: 'L4', fen: 'L5', coast: 'L6', thorn: 'L7', citadel: 'L8', spire: 'L9', frost: 'L10', throne: 'L11' }, terr = {};
+  var TSET = { marsh: 'L1', salt: 'L2', quarry: 'L3', volcano: 'L2', forest: 'L3', crypt: 'L4', fen: 'L5', coast: 'L6', thorn: 'L7', citadel: 'L8', spire: 'L9', frost: 'L10', throne: 'L11' }, terr = {};
   var TTINT = {}; // a land without its own set can borrow one, recoloured: { theme: 'rgba(...)' }
   SP.q = 'high'; // image smoothing quality for painted art; the overworld lowers it on slow devices
   SP.terrainReady = function (name) { return !!terrainFor(name); };

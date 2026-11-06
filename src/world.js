@@ -21,10 +21,38 @@ var LANDS = [
     ],
     boss: { id: 'boss1', name: 'Grist, the Hollow Miller', level: 'BOSS', sigil: 'miller', gens: ['AN1_PRG', 'AN2_PRG', 'AN1_MAS', 'AN2_MAS'], title: 'Millbreaker',
       flavor: 'The miller ground the last harvest of the Fields into dust and kept grinding. His gate on the hill is sealed until every creature of the Fields has fallen at least once. Behind it: four questions, and four hundred Lore.' }
+  },
+  { id: 'L2', unit: 2, name: 'The Salt Wastes', subject: 'Exponents', open: true, explore: 2, banner: 'banner-l2',
+    blurb: 'The bed of a sea that dried up a thousand years ago. What was left behind keeps growing: crystals that double, then double again, until the whole plain glitters with powers. Learn the laws of the salt and cross it.',
+    outcomes: { AN3L: 'AN3 · Exponent laws, zero and negative exponents', AN3R: 'AN3 · Scientific notation and rational exponents' },
+    creatures: [
+      { id: 'saltmite', name: 'Salt Mite', outcome: 'AN3', group: 'AN3L', level: 'BEG', sigil: 'saltmite', gen: 'AN3L_BEG', flavor: 'Every time it moults, it leaves two copies of itself behind. Count them by their exponents; counting them one at a time is how the caravans got lost.' },
+      { id: 'strider', name: 'Crust Strider', outcome: 'AN3', group: 'AN3L', level: 'PRG', sigil: 'strider', gen: 'AN3L_PRG', flavor: 'It wades through the salt on legs like stilts, stacking crystal on crystal on its back. Raise a bracket to a power and it raises everything inside.' },
+      { id: 'colossus', name: 'Salt Colossus', outcome: 'AN3', group: 'AN3L', level: 'MAS', sigil: 'colossus', gen: 'AN3L_MAS', flavor: 'A giant of fused salt blocks. Whatever it divides it also flips, and it hides one exponent in every question. Find it.' },
+      { id: 'scarab', name: 'Glass Scarab', outcome: 'AN3', group: 'AN3R', level: 'BEG', sigil: 'scarab', gen: 'AN3R_BEG', flavor: 'Its shell holds more grains of salt than there are stars. It only ever writes the number one way: something times ten to the something.' },
+      { id: 'mirage', name: 'Mirage Wraith', outcome: 'AN3', group: 'AN3R', level: 'PRG', sigil: 'mirage', gen: 'AN3R_PRG', flavor: 'Half there and half not, like an exponent that is half a power and half a root. It shimmers between the two forms and dares you to say which is which.' },
+      { id: 'serpent', name: 'Brine Serpent', outcome: 'AN3', group: 'AN3R', level: 'MAS', sigil: 'serpent', gen: 'AN3R_MAS', flavor: 'The last living thing of the old sea, coiled in its last pool. Its scales are fractions, and every one of them is negative.' }
+    ],
+    boss: { id: 'boss2', name: 'Halora, the Brine Queen', level: 'BOSS', sigil: 'halora', gens: ['AN3L_PRG', 'AN3R_PRG', 'AN3L_MAS', 'AN3R_MAS'], title: 'Saltbreaker',
+      flavor: 'She ruled the sea when it was water, and she rules the salt it left. Her crystal palace is sealed until every creature of the Wastes has fallen at least once. Inside: four questions, and four hundred Lore.' }
+  },
+  { id: 'L3', unit: 3, name: 'The Deep Quarry', subject: 'Polynomial Operations', open: true, explore: 2, banner: 'banner-l3',
+    blurb: 'A pit cut terrace by terrace into the mountain, deeper every year, until the stonecutters dug too far and something dug back. Every block here is a term; every wall is a sum of them. Climb down.',
+    outcomes: { AN4A: 'AN4 · Terms, like terms, adding, subtracting and multiplying by a monomial', AN4B: 'AN4 · Two binomials, special products and binomial × trinomial' },
+    creatures: [
+      { id: 'chipling', name: 'Chipling', outcome: 'AN4', group: 'AN4A', level: 'BEG', sigil: 'chipling', gen: 'AN4A_BEG', flavor: 'A heap of chips with a chisel and a grudge. It sorts every stone into piles of the same kind, and bites anyone who mixes them up.' },
+      { id: 'mason', name: 'Mason Wight', outcome: 'AN4', group: 'AN4A', level: 'PRG', sigil: 'mason', gen: 'AN4A_PRG', flavor: 'He laid the quarry\'s first wall and never stopped working. He takes a whole row of blocks away in one stroke, and every sign flips when he does.' },
+      { id: 'titan', name: 'Slab Titan', outcome: 'AN4', group: 'AN4A', level: 'MAS', sigil: 'titan', gen: 'AN4A_MAS', flavor: 'Stacked from the biggest slabs ever cut here. It multiplies everything it touches, and it remembers the one coefficient you forgot.' },
+      { id: 'twinbat', name: 'Twinwing Bat', outcome: 'AN4', group: 'AN4B', level: 'BEG', sigil: 'twinbat', gen: 'AN4B_BEG', flavor: 'Two heads, two shrieks, one hunger. First, Outside, Inside, Last: it bites in that order, every time.' },
+      { id: 'crane', name: 'Crane Golem', outcome: 'AN4', group: 'AN4B', level: 'PRG', sigil: 'crane', gen: 'AN4B_PRG', flavor: 'The old lifting crane walked off its post one night. It hauls brackets up and squares them, and it never forgets the middle term.' },
+      { id: 'hydra', name: 'Stone Hydra', outcome: 'AN4', group: 'AN4B', level: 'MAS', sigil: 'hydra', gen: 'AN4B_MAS', flavor: 'Three heads on one body, like a trinomial on a binomial. Cut off one and you have to deal with all six products at once.' }
+    ],
+    boss: { id: 'boss3', name: 'Old Moraine, the Pit Foreman', level: 'BOSS', sigil: 'moraine', gens: ['AN4A_PRG', 'AN4B_PRG', 'AN4A_MAS', 'AN4B_MAS'], title: 'Pitbreaker',
+      flavor: 'He ran the quarry for three hundred years and never let a single stone leave without counting it. His gate at the bottom of the pit opens when every creature of the Quarry has fallen at least once. Down there: four questions, and four hundred Lore.' }
   }
 ];
 /* Lands still to come, shown fogged on the world map until they are built (ids match WM_DEFS regions). */
-var LANDS_SOON = { L2: 'The Salt Wastes', L3: 'The Deep Quarry', L4: 'The Hollowdeep Mines', L5: "Cogwright's Ruin", L6: 'The Sheer Stair', L7: 'The Waystone Hills', L8: 'The Crossroads' };
+var LANDS_SOON = { L4: 'The Hollowdeep Mines', L5: "Cogwright's Ruin", L6: 'The Sheer Stair', L7: 'The Waystone Hills', L8: 'The Crossroads' };
 /* The tutorial: a small land off the world map where nothing is kept. New heroes start here; the Rules page reopens it. */
 var TUTORIAL = { id: 'T0', unit: 0, name: 'The Proving Grounds', subject: 'How to play', open: true, explore: 2, tutorial: true, banner: 'title',
   blurb: 'A fenced yard behind the first bonfire where new heroes learn the ways of the road. Nothing here is kept, and nothing here can truly kill you.',

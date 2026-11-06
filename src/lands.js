@@ -208,83 +208,78 @@ var LandMaps = (function () {
     rooms.forEach(function (c) { nooks.push({ x: c.rm.x + c.rm.w - 2, y: c.rm.y + 1 }); });
     return { name: 'fields and hedgerows', spawn: fire, bossRoom: boss, areas: areas, key: { x: far.rm.x + 1, y: far.rm.y + far.rm.h - 2 }, nooks: nooks };
   };
-  /* L2 · Ember Peaks — THE SWITCHBACK CLIMB.
-   * You start at the foot of the mountain and the boss waits in the crater at the summit. One road zigzags up
-   * the slope in five long switchbacks, with a ledge at every hairpin. Two lava rivers pour straight down the
-   * mountain, so every switchback crosses them on a bridge. A steep chimney cuts straight up the middle (the
-   * shortcut, and a second way down), and short caves bite into the rock between the roads. Difficulty rises
-   * with height: the higher you climb, the harder it gets. */
+  /* L2 · The Salt Wastes — THE CRUST FLATS.
+   * A dead sea bed: wide open salt flats (long sightlines, you are seen) cut into lanes by three crystal pressure
+   * ridges that run across the way west, each broken by a few gaps. Brine pools and crystal outcrops dot the lanes.
+   * The caravan track wanders from the bonfire in the south-west to the Brine Queen's palace in the north-east,
+   * crossing each ridge at a gap. A walled crystal garden in the far north-west, with one way in, hides the key. */
   BP.L2 = function (k) {
-    var r = k.r, W = k.W, H = k.H;
-    var rows = [78, 64, 50, 36, 22], xl = 8, xr = W - 9;
-    // lava rivers first, so roads bridge them
-    k.road([{ x: 22, y: 2 }, { x: 18, y: 30 }, { x: 24, y: 56 }, { x: 20, y: H - 2 }], 3, WATER, 4);
-    k.road([{ x: 44, y: 2 }, { x: 47, y: 26 }, { x: 41, y: 52 }, { x: 46, y: H - 2 }], 2, WATER, 4);
-    k.disc(30, 70, 2.5, WATER, 0.6); k.disc(52, 44, 2, WATER, 0.6); k.disc(12, 30, 2, WATER, 0.6);
-    var turns = [];
-    for (var i = 0; i < rows.length; i++) {
-      k.road([{ x: xl, y: rows[i] }, { x: xr, y: rows[i] }], 3, PATH, 1.5);
-      if (i < rows.length - 1) { var tx = i % 2 === 0 ? xr : xl; k.road([{ x: tx, y: rows[i] }, { x: tx + (i % 2 === 0 ? 2 : -2), y: (rows[i] + rows[i + 1]) / 2 }, { x: tx, y: rows[i + 1] }], 3, PATH, 0); turns.push({ x: tx + (i % 2 === 0 ? -1 : 1), y: (rows[i] + rows[i + 1]) / 2 }); k.ell(tx, (rows[i] + rows[i + 1]) / 2, 5, 4, GROUND, 0.6, k.notWater); }
-    }
-    // the chimney: a steep shortcut straight up the middle, from the second road to the fourth, with a vent cave half way
-    k.road([{ x: 33, y: rows[1] }, { x: 31, y: 57 }, { x: 34, y: rows[2] }, { x: 32, y: 43 }, { x: 33, y: rows[3] }], 2, PATH, 1);
-    k.ell(32, 57, 3, 2.5, GROUND, 0.5, k.notWater);
-    // side caves: short dead ends into the rock between the roads
-    var caves = [[14, rows[0], -1], [52, rows[0], -1], [40, rows[1], 1], [12, rows[1], -1], [56, rows[2], 1], [26, rows[2], -1], [38, rows[3], -1], [10, rows[3], 1], [50, rows[4], 1], [28, rows[4], 1]];
-    var nooks = [];
-    caves.forEach(function (c) { var ex = c[0] + (r() < 0.5 ? -2 : 2), ey = c[1] + c[2] * 6; k.road([{ x: c[0], y: c[1] }, { x: ex, y: ey }], 2, GROUND, 0); k.ell(ex, ey + c[2], 2.2, 1.8, GROUND, 0.5, k.notWater); nooks.push({ x: Math.round(ex), y: Math.round(ey + c[2]) }); });
-    // the summit crater and the Furnace King's hall
-    var boss = bossRoom(k, Math.floor(W / 2) - 7, 3, 14, 8, 'S');
-    k.ell(W / 2, 17, 7, 3, GROUND, 0.5, k.notWater);
-    k.road([boss.front, { x: W / 2, y: rows[4] }], 3, PATH, 0);
-    // the key: at the end of a long cave from the top road's far end, down into the mountain
-    k.road([{ x: xl, y: rows[4] }, { x: 4, y: 26 }, { x: 5, y: 31 }], 2, GROUND, 0); k.disc(5, 32, 2, GROUND, 0.3);
-    var fire = { x: xl + 1, y: rows[0] };
+    var r = k.r, W = k.W, H = k.H, isG = function (v) { return v === GROUND; };
+    k.rect(1, 1, W - 2, H - 2, GROUND);
+    var ridges = [[{ x: 22, y: 2 }, { x: 27, y: 22 }, { x: 33, y: 40 }, { x: 36, y: H - 2 }], [{ x: 44, y: 2 }, { x: 49, y: 20 }, { x: 53, y: 38 }, { x: 58, y: H - 2 }], [{ x: 62, y: 16 }, { x: 67, y: 32 }, { x: 72, y: H - 2 }]];
+    var lines = ridges.map(function (p) { return k.road(p, 3, WALL, 2.5); });
+    var gaps = [];
+    var _g = 0; lines.forEach(function (ln, j) { [0.22, 0.55, 0.86].forEach(function (f, q) { if (j === 2 && q === 0) return; var pt = ln[Math.floor(f * (ln.length - 1))]; k.disc(pt.x, pt.y, 2.2, GROUND); gaps.push(pt); }); });
+    // brine pools and crystal outcrops in the lanes
+    k.clumps(6, 6, W - 12, H - 12, 9, 2.4, WATER, isG);
+    k.clumps(4, 4, W - 8, H - 8, 34, 1.9, WALL, isG);
+    // short spurs off the ridges: the lanes become a loose maze of crystal
+    lines.forEach(function (ln) { for (var q = 2; q < ln.length - 2; q += 9) { var p0 = ln[q], dx = (r() < 0.5 ? -1 : 1) * (4 + r() * 6); k.road([p0, { x: p0.x + dx, y: p0.y + (r() - 0.5) * 6 }], 2, WALL, 1); } });
+    // the crystal garden: a walled ring in the far north-west with one gap facing south-east; the key waits inside
+    k.disc(11, 11, 7, GROUND); k.ring(11, 11, 7, 8.6, WALL); k.disc(16, 16, 1.8, GROUND);
+    var fire = { x: 7, y: H - 8 };
+    var boss = bossRoom(k, W - 17, 3, 13, 9, 'S');
+    k.road([fire, { x: 18, y: 46 }, gaps[2], { x: 42, y: 40 }, gaps[4], { x: 60, y: 30 }, gaps[6], { x: boss.front.x, y: 24 }, boss.front], 2, PATH, 2);
+    k.disc(fire.x, fire.y, 3, GROUND, 0.4);
+    var nooks = [{ x: 4, y: 26 }, { x: 14, y: 30 }, { x: 4, y: 40 }, { x: 18, y: 56 }, { x: 30, y: 6 }, { x: 38, y: 14 }, { x: 28, y: 52 }, { x: 44, y: 56 }, { x: 52, y: 8 }, { x: 58, y: 48 }, { x: 64, y: 56 }, { x: 78, y: 40 }, { x: 80, y: 54 }, { x: 74, y: 20 }, { x: 40, y: 30 }, { x: 8, y: 8 }, { x: 14, y: 6 }];
     return {
-      name: 'switchbacks', spawn: fire, bossRoom: boss,
+      name: 'salt flats', spawn: fire, bossRoom: boss,
       areas: [
-        { x: 34, y: rows[0], rx: 6, ry: 1, tier: 'BEG' }, { x: turns[0].x, y: turns[0].y, rx: 3, tier: 'BEG' }, { x: 30, y: rows[1], rx: 6, ry: 1, tier: 'BEG' },
-        { x: turns[1].x, y: turns[1].y, rx: 3, tier: 'PRG' }, { x: 32, y: rows[2], rx: 8, ry: 1, tier: 'PRG' }, { x: 32, y: 57, rx: 2, tier: 'PRG' },
-        { x: turns[2].x, y: turns[2].y, rx: 3, tier: 'MAS' }, { x: 30, y: rows[3], rx: 8, ry: 1, tier: 'MAS' }, { x: turns[3].x, y: turns[3].y, rx: 3, tier: 'MAS' }
+        { x: 12, y: 44, rx: 4, tier: 'BEG' }, { x: 22, y: 54, rx: 4, tier: 'BEG' }, { x: 10, y: 28, rx: 4, tier: 'BEG' },
+        { x: 36, y: 18, rx: 4, tier: 'PRG' }, { x: 42, y: 46, rx: 4, tier: 'PRG' }, { x: 40, y: 32, rx: 3, tier: 'PRG' },
+        { x: 56, y: 12, rx: 4, tier: 'MAS' }, { x: 64, y: 46, rx: 4, tier: 'MAS' }, { x: 76, y: 32, rx: 3, tier: 'MAS' }
       ],
-      key: { x: 5, y: 32 }, nooks: nooks.concat([{ x: W / 2 - 5, y: 17 }, { x: W / 2 + 5, y: 17 }, { x: xr, y: rows[4] }, { x: 31, y: 58 }])
+      key: { x: 10, y: 10 }, nooks: nooks
     };
   };
 
-  /* L3 · Whispering Weald — THE TANGLED WOOD.
-   * An organic maze of trails and hollows grown by a cellular automaton, cut in two by a winding river with
-   * only three fords. Seven glades are the anchors (each one recognisable), and the trails between them loop,
-   * so getting lost is part of the fun but never a trap. The bonfire sits in the south-west; the Hollow Oak
-   * stands in its own walled glade across the river in the north-east. */
+  /* L3 · The Deep Quarry — THE SPIRAL PIT.
+   * Three terraces cut in rings around the pit, each lower than the last, with Old Moraine's hall in the bottom.
+   * Two ramps join each terrace to the next, never at the same angle, so you walk part of every ring on the way
+   * down (and can always climb back by the other ramp). Stonecutters' niches bite into the walls; a flooded
+   * cutting fills one side of the top terrace. A mine tunnel runs from the top terrace into the north-east
+   * corner of the mountain, and the key waits at its end. Difficulty rises with depth. */
   BP.L3 = function (k) {
-    var r = k.r, W = k.W, H = k.H;
-    k.cave(2, 2, W - 4, H - 4, 0.5, 5);
-    var river = [{ x: 1, y: 34 }, { x: 18, y: 38 }, { x: 34, y: 29 }, { x: 50, y: 33 }, { x: 64, y: 21 }, { x: W - 2, y: 15 }];
-    k.road(river, 2, WATER, 3);
-    var fire = { x: 10, y: 52 };
-    var gl = [{ x: 24, y: 50 }, { x: 44, y: 47 }, { x: 64, y: 42 }, { x: 13, y: 22 }, { x: 30, y: 12 }, { x: 47, y: 18 }, { x: 76, y: 32 }];
-    gl.forEach(function (g, i) { k.ell(g.x, g.y, 5 + (i % 3), 4, GROUND, 0.7, k.notWater); });
-    k.disc(fire.x, fire.y, 4, GROUND, 0.4);
-    var trail = function (pts) { k.road(pts, 2, PATH, 3, k.notWater); };
-    trail([fire, gl[0], gl[1], gl[2], gl[6]]);
-    trail([gl[0], { x: 20, y: 39 }]); trail([{ x: 18, y: 36 }, gl[3], gl[4], gl[5], { x: 44, y: 31 }]); trail([{ x: 44, y: 33 }, gl[1]]);
-    trail([gl[2], { x: 66, y: 24 }]); trail([gl[5], { x: 60, y: 14 }]);
-    // fords: paths laid over the river
-    [[19, 38], [44, 32], [67, 22]].forEach(function (f) { k.rect(f[0] - 2, f[1] - 2, 4, 4, PATH); });
-    var boss = bossRoom(k, 66, 3, 12, 8, 'W');
-    trail([{ x: 60, y: 14 }, boss.front]);
-    // the key: deep in the north-west, at the end of a thorny lane past the last glade
-    trail([gl[3], { x: 6, y: 12 }, { x: 5, y: 5 }]); k.disc(5, 5, 2, GROUND);
+    var r = k.r, W = k.W, H = k.H, cx = Math.floor(W / 2), cy = Math.floor(H / 2), D = Math.PI / 180;
+    function at(deg, rad) { return { x: Math.round(cx + rad * Math.cos(deg * D)), y: Math.round(cy - rad * Math.sin(deg * D)) }; }
+    k.rect(1, 1, W - 2, H - 2, WALL);
+    k.ring(cx, cy, 29, 33, GROUND); k.ring(cx, cy, 21, 25, GROUND); k.ring(cx, cy, 13, 17, GROUND);
+    // ramps: radial cuts through the walls between terraces
+    function ramp(deg, r0, r1) { k.road([at(deg, r0), at(deg, r1)], 3, PATH, 0); }
+    ramp(20, 31, 23); ramp(300, 31, 23); ramp(120, 23, 15); ramp(200, 23, 15);
+    // a worn track around each terrace
+    [31, 23, 15].forEach(function (rad, j) { var pts = []; for (var a = 0; a <= 360; a += 15) pts.push(at(a, rad)); for (var q = 1; q < pts.length; q++) if (r() < 0.55) k.seg(pts[q - 1].x, pts[q - 1].y, pts[q].x, pts[q].y, 1, PATH, function (v) { return v === GROUND; }); });
+    // stonecutters' niches cut outward from each terrace (the dead ends that pay)
+    var nooks = [];
+    [[60, 33], [100, 33], [160, 33], [210, 33], [290, 33], [340, 33], [80, 25], [180, 25], [300, 25], [40, 17], [150, 17], [200, 17]].forEach(function (n) { var outer = n[1] === 33, a = at(n[0], n[1] + 1), b = at(n[0], n[1] + (outer ? 3 : 1.5)); k.seg(a.x, a.y, b.x, b.y, outer ? 2 : 1, GROUND); k.disc(b.x, b.y, outer ? 1.6 : 0.8, GROUND); nooks.push(b); }); // inner niches stay shallow so they never break into the terrace above
+    // a flooded cutting on the top terrace, and rubble heaps for cover
+    var pool = at(250, 31); k.disc(pool.x, pool.y, 3.2, WATER, 0.6, function (v) { return v === GROUND; });
+    [[45, 31], [230, 31], [10, 23], [200, 23], [100, 15], [290, 15]].forEach(function (h) { var p = at(h[0], h[1]); k.disc(p.x, p.y, 1.1, WALL, 0.5, function (v) { return v === GROUND; }); });
+    // Old Moraine's hall at the bottom, its gate facing north onto the lowest terrace
+    var boss = bossRoom(k, cx - 6, cy - 4, 12, 8, 'N');
+    k.road([boss.front, at(90, 15)], 2, PATH, 0);
+    // the mine tunnel: from the top terrace into the north-east corner
+    var t0 = at(45, 33); k.road([t0, { x: W - 9, y: 9 }, { x: W - 6, y: 5 }], 2, GROUND, 1); k.disc(W - 6, 5, 2, GROUND);
+    var fire = at(180, 31);
+    k.disc(fire.x, fire.y, 2.6, GROUND, 0.3);
     return {
-      name: 'tangled wood', spawn: fire, bossRoom: boss, fillPockets: true,
+      name: 'spiral pit', spawn: fire, bossRoom: boss,
       areas: [
-        { x: gl[0].x, y: gl[0].y, rx: 4, tier: 'BEG' }, { x: gl[1].x, y: gl[1].y, rx: 4, tier: 'BEG' }, { x: 33, y: 50, rx: 3, tier: 'BEG' },
-        { x: gl[2].x, y: gl[2].y, rx: 4, tier: 'PRG' }, { x: gl[3].x, y: gl[3].y, rx: 4, tier: 'PRG' }, { x: gl[4].x, y: gl[4].y, rx: 4, tier: 'PRG' },
-        { x: gl[5].x, y: gl[5].y, rx: 4, tier: 'MAS' }, { x: gl[6].x, y: gl[6].y, rx: 4, tier: 'MAS' }, { x: 60, y: 14, rx: 2, tier: 'MAS' }
+        { x: at(140, 31).x, y: at(140, 31).y, rx: 2, tier: 'BEG' }, { x: at(240, 31).x, y: at(240, 31).y, rx: 2, tier: 'BEG' }, { x: at(80, 31).x, y: at(80, 31).y, rx: 2, tier: 'BEG' },
+        { x: at(60, 23).x, y: at(60, 23).y, rx: 2, tier: 'PRG' }, { x: at(170, 23).x, y: at(170, 23).y, rx: 2, tier: 'PRG' }, { x: at(290, 23).x, y: at(290, 23).y, rx: 2, tier: 'PRG' },
+        { x: at(30, 15).x, y: at(30, 15).y, rx: 2, tier: 'MAS' }, { x: at(160, 15).x, y: at(160, 15).y, rx: 2, tier: 'MAS' }, { x: at(260, 15).x, y: at(260, 15).y, rx: 2, tier: 'MAS' }
       ],
-      key: { x: 5, y: 5 },
-      nooks: [{ x: 4, y: 40 }, { x: 36, y: 56 }, { x: 56, y: 54 }, { x: 80, y: 50 }, { x: 80, y: 40 }, { x: 22, y: 4 }, { x: 40, y: 4 }, { x: 55, y: 25 }, { x: 28, y: 22 }, { x: 4, y: 28 }, { x: 70, y: 55 }, { x: 36, y: 40 }, { x: 58, y: 4 }, { x: 14, y: 44 }],
-      pocketNooks: true
+      key: { x: W - 6, y: 5 }, nooks: nooks.concat([at(20, 31), at(260, 23), at(120, 23)])
     };
   };
 
@@ -666,7 +661,7 @@ var LandMaps = (function () {
       key: { x: 22, y: 30 }, nooks: [{ x: 5, y: 13 }, { x: 13, y: 13 }] };
   };
 
-  var SIZES = { T0: [48, 36], L11: [45, 76], L1: [84, 56], L2: [64, 84], L3: [84, 60], L4: [79, 57], L5: [88, 56], L6: [104, 44], L7: [76, 72], L8: [96, 62], L9: [78, 78], L10: [100, 66] };
+  var SIZES = { T0: [48, 36], L11: [45, 76], L1: [84, 56], L2: [84, 60], L3: [76, 76], L4: [79, 57], L5: [88, 56], L6: [104, 44], L7: [76, 72], L8: [96, 62], L9: [78, 78], L10: [100, 66] };
 
   function build(L, env) {
     var bpf = BP[L.id]; if (!bpf) return null;

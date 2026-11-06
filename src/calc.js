@@ -1,5 +1,5 @@
 /* Copied from the math15 repo (js/calc.js): the same TI-30XIIS emulator as the practice site. Unbound changes only the
- * title bar ("The Reckoner"); the look comes from the .calc rules in style.css. Keep the engine in step with math15.
+ * title bar ("The Reckoner") and draws the close cross as an SVG (centred); the look comes from the .calc rules in style.css. Keep the engine in step with math15.
  *
  * On-screen scientific calculator with the key layout of the real TI-30XIIS (two-line display: entry on top, result below).
  * Every key sits where it is on the real calculator, with its 2nd function above it: DRG (angle mode menu DEG RAD GRD),
@@ -403,7 +403,7 @@
     var c = new Calc(), box = el('div', 'calc hidden'); box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', 'Calculator (TI-30XIIS key layout)');
     box.tabIndex = -1;
     var head = el('div', 'calc-head', '<span class="calc-brand">The Reckoner <em>TI-30XIIS keys</em></span>');
-    var close = el('button', 'calc-close', '×'); close.type = 'button'; close.title = 'Close calculator'; head.appendChild(close);
+    var close = el('button', 'calc-close', '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>'); close.setAttribute('aria-label', 'Close calculator'); close.type = 'button'; close.title = 'Close calculator'; head.appendChild(close);
     var screen = el('div', 'calc-screen'), ind = el('div', 'calc-ind'), l1 = el('div', 'calc-l1'), l2 = el('div', 'calc-l2');
     screen.appendChild(ind); screen.appendChild(l1); screen.appendChild(l2);
     var pad = el('div', 'calc-pad');

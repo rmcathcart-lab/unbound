@@ -260,7 +260,8 @@
     var sb = el('button', 'satchel-btn' + (UI.satchel ? ' on' : ''), '<span class="sbl">Satchel</span>' + (ic ? '<span class="sbi"><img class="c" src="' + ic + '" alt=""><img class="o" src="' + io + '" alt=""></span>' : ''));
     sb.type = 'button'; sb.title = 'Satchel (press I)'; sb.setAttribute('aria-label', 'Satchel (press I)'); sb.setAttribute('aria-expanded', UI.satchel ? 'true' : 'false'); sb.onclick = function () { openSatchel(); }; nav.appendChild(sb);
     if (window.HW && HW.Calc) { // the on-screen calculator (TI-30XIIS keys, src/calc.js): in case a student has no handheld one
-      var cb = el('button', 'calc-btn' + (HW.Calc.get().isOpen() ? ' on' : ''), '<span class="cbl">Calculator</span><span class="cbi">' + HW.CALC_ICON + '</span>');
+      var ci0 = window.ART_IMG && ART_IMG['ui-calc-off'], ci1 = window.ART_IMG && ART_IMG['ui-calc-on'];
+      var cb = el('button', 'calc-btn' + (HW.Calc.get().isOpen() ? ' on' : ''), '<span class="cbl">Calculator</span><span class="cbi">' + (ci0 ? '<img class="c" src="' + ci0 + '" alt=""><img class="o" src="' + ci1 + '" alt="">' : HW.CALC_ICON) + '</span>');
       cb.type = 'button'; cb.title = 'Calculator (press C)'; cb.setAttribute('aria-label', 'Calculator (press C)'); cb.setAttribute('aria-pressed', HW.Calc.get().isOpen() ? 'true' : 'false');
       cb.onclick = function () { HW.Calc.toggle(); }; nav.appendChild(cb);
       HW.Calc.get().onToggle = function (open) { var b = document.querySelector('.hud .calc-btn'); if (b) { b.classList.toggle('on', open); b.setAttribute('aria-pressed', open ? 'true' : 'false'); } };

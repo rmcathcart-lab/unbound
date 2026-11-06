@@ -1175,12 +1175,15 @@ table.lg-students tr[data-key] { cursor: pointer; }
 .mc-opts b { display: inline-block; min-width: 1.6em; color: var(--ember); font-family: var(--font-ui); }
 
 /* ---------- the Reckoner: the on-screen calculator (src/calc.js, TI-30XIIS keys) dressed as a piece of the world ---------- */
-.hud .nav .calc-btn { display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px 2px 10px; }
-.calc-btn .cbi { display: inline-flex; width: 26px; height: 26px; align-items: center; justify-content: center; color: #e2c27a; }
+/* calculator button: the painted Reckoner, its window dark at rest, lit on hover and while open (like the Satchel) */
+.hud .nav .calc-btn { display: inline-flex; align-items: center; gap: 6px; padding: 2px 4px 2px 10px; }
+.calc-btn .cbi { position: relative; width: 30px; height: 30px; flex: none; color: #e2c27a; display: inline-flex; align-items: center; justify-content: center; }
+.calc-btn .cbi img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; transition: opacity .15s ease, transform .2s ease; }
 .calc-btn .cbi svg { width: 22px; height: 22px; }
-.calc-btn.on { border-color: #b8893a; box-shadow: 0 0 12px rgba(217,120,46,.35); }
-.calc-btn.on .cbi { color: #ffd98a; filter: drop-shadow(0 0 4px rgba(255,190,90,.6)); }
-@media (max-width: 520px) { .calc-btn .cbl { display: none; } .hud .nav .calc-btn { padding: 2px 6px; } }
+.calc-btn .cbi .o { opacity: 0; }
+.calc-btn:hover .cbi .c, .calc-btn:focus-visible .cbi .c, .calc-btn.on .cbi .c { opacity: 0; }
+.calc-btn:hover .cbi .o, .calc-btn:focus-visible .cbi .o, .calc-btn.on .cbi .o { opacity: 1; transform: translateY(-1px); }
+@media (max-width: 520px) { .calc-btn .cbl { display: none; } .hud .nav .calc-btn { padding: 2px 4px; } .calc-btn .cbi { width: 26px; height: 26px; } }
 
 .calc { position: fixed; right: 24px; bottom: 24px; z-index: 300; width: 316px; padding: 10px 14px 18px; color: var(--bone); user-select: none; -webkit-user-select: none; outline: none;
   border-radius: 18px 18px 26px 26px; border: 2px solid #6b4a22;
@@ -1192,7 +1195,8 @@ table.lg-students tr[data-key] { cursor: pointer; }
 .calc-head { display: flex; align-items: center; justify-content: space-between; cursor: move; padding: 0 10px 8px; touch-action: none; }
 .calc-brand { font-family: var(--font-display); font-size: 14px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #e2c27a; text-shadow: 0 0 8px rgba(217,120,46,.35); }
 .calc-brand em { display: block; font-family: var(--font-ui); font-style: normal; font-weight: 400; font-size: 10px; letter-spacing: .08em; text-transform: none; color: var(--bone-dim); text-shadow: none; margin-top: 1px; }
-.calc-close { border: 1px solid #5a4126; background: #1d1611; color: var(--bone); width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 17px; line-height: 1; }
+.calc-close { border: 1px solid #5a4126; background: #1d1611; color: var(--bone); width: 30px; height: 30px; padding: 0; border-radius: 50%; cursor: pointer; display: grid; place-items: center; flex: none; }
+.calc-close svg { width: 12px; height: 12px; display: block; }
 .calc-close:hover { border-color: var(--ember); color: #fff; }
 .calc-screen { border-radius: 6px; padding: 4px 8px 6px; margin-bottom: 12px; height: 86px; display: flex; flex-direction: column; color: #2a1d0e; font-family: "Courier New", ui-monospace, monospace;
   background: linear-gradient(180deg, #e9dbb4, #cdb98a); border: 2px solid #6b4a22; box-shadow: inset 0 2px 6px rgba(60,35,10,.55), 0 0 0 1px #000, 0 0 14px rgba(226,194,122,.15); }

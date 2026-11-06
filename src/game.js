@@ -228,13 +228,13 @@
   function streakRate() { return owns('crown') ? { rate: 0.10, cap: 10 } : { rate: 0.05, cap: 10 }; }
   function rewardFor(level, isBoss, used) {
     var base = LEVELS[level].lore, parts = [{ k: 'Base', m: base }], mult = 1;
-    if (owns('blade')) { mult *= 1.25; parts.push({ k: 'Runed Blade', m: '×1.25' }); }
-    if (owns('mark') && (level === 'PRG' || level === 'MAS')) { mult *= 1.5; parts.push({ k: "Hunter's Mark", m: '×1.5' }); }
-    if (owns('crown') && isBoss) { mult *= 2; parts.push({ k: 'Crown of Ash', m: '×2' }); }
+    if (owns('blade')) { mult *= 1.25; parts.push({ k: 'Whetted Sickle', m: '×1.25' }); }
+    if (owns('mark') && (level === 'PRG' || level === 'MAS')) { mult *= 1.5; parts.push({ k: "Poacher's Tally", m: '×1.5' }); }
+    if (owns('crown') && isBoss) { mult *= 2; parts.push({ k: 'Briar Crown', m: '×2' }); }
     if ((S.level || 1) > 1) { var lm = levelLoreMult(); mult *= lm; parts.push({ k: 'Level ' + S.level, m: '×' + lm.toFixed(2) }); }
     var sr = streakRate(), sm = 1 + Math.min(S.streak, sr.cap) * sr.rate;
     if (S.streak > 0) parts.push({ k: 'Streak ' + S.streak, m: '×' + sm.toFixed(2).replace(/0$/, '') });
-    var use = 1; if (used.tome) { use = 0.5; parts.push({ k: "Scholar's Tome", m: '×0.5' }); } else if (used.hint) { use = 0.75; parts.push({ k: 'Lantern', m: '×0.75' }); }
+    var use = 1; if (used.tome) { use = 0.5; parts.push({ k: 'Road Almanac', m: '×0.5' }); } else if (used.hint) { use = 0.75; parts.push({ k: 'Tallow Lantern', m: '×0.75' }); }
     return { amount: Math.max(1, Math.round(base * mult * sm * use)), parts: parts };
   }
 
@@ -482,7 +482,7 @@
     { id: 'reclaim', tier: 'pathfinder', name: 'Back From the Grave', desc: 'Win back the Lore you dropped when you died.', progress: function () { return [stat('reclaims'), 1]; } },
     { id: 'first-seal', tier: 'pathfinder', name: 'Seal Breaker', desc: 'Slay the boss of a land.', progress: function () { return [bossTotal(), 1]; } },
     { id: 'five-seals', tier: 'warden', name: 'Five Seals Broken', desc: 'Slay the bosses of five lands.', progress: function () { return [bossTotal(), 5]; } },
-    { id: 'clean-boss', tier: 'lorekeeper', name: 'No Help Needed', desc: 'Slay a boss without a hint, a Scholar\'s Lens or the Tome.', progress: function () { return [stat('cleanBosses'), 1]; } },
+    { id: 'clean-boss', tier: 'lorekeeper', name: 'No Help Needed', desc: 'Slay a boss without a hint, an Owl-glass or the Almanac.', progress: function () { return [stat('cleanBosses'), 1]; } },
     { id: 'quick-mastery', tier: 'lorekeeper', name: 'Quick Study', desc: 'Slay a Mastery creature with more than half of the clock left.', progress: function () { return [stat('quickMastery'), 1]; } },
     { id: 'clean-sweep', tier: 'warden', name: 'Clean Sweep', desc: 'Slay every kind of creature in a land, and its boss.', check: landSwept },
     { id: 'bestiary', tier: 'lorekeeper', name: 'Know Thy Enemy', desc: 'Meet every creature of the lands.', progress: function () { var a = allCreatures(); return [a.filter(function (id) { return S.met && S.met[id]; }).length, a.length]; } },
@@ -493,7 +493,7 @@
     { id: 'all-gear', tier: 'mythic', name: 'Fully Forged', desc: 'Own every piece of gear the Forge sells.', progress: function () { var a = gearAll(); return [a.filter(function (g) { return owns(g.id); }).length, a.length]; } },
     { id: 'level-10', tier: 'pathfinder', name: 'Pathfinder', desc: 'Reach level 10.', progress: function () { return [S.level || 1, 10]; } },
     { id: 'level-25', tier: 'mythic', name: 'Mythic', desc: 'Reach level 25.', progress: function () { return [S.level || 1, 25]; } },
-    { id: 'hoard', tier: 'delver', name: 'Dragon\'s Hoard', desc: 'Carry 1,000 Lore at once. (Spend it soon.)', check: function () { return (S.lore || 0) >= 1000; } }
+    { id: 'hoard', tier: 'delver', name: 'Heavy Pockets', desc: 'Carry 1,000 Lore at once. (Spend it soon: Nettle is waiting.)', check: function () { return (S.lore || 0) >= 1000; } }
   ];
   function achDone(a) { if (a.check) return !!a.check(); var p = a.progress(); return p[0] >= p[1]; }
   function checkAchievements() {
@@ -800,9 +800,9 @@
     var from = UI.tut.from; sfx('bonfire');
     showModal('<div class="tut-done"><div class="eyebrow">The Proving Grounds</div><h2>You are ready</h2>' +
       '<p>At every bonfire in the lands, three keepers will take your Lore:</p><ul class="rules">' +
-      '<li><b>Bram, at the Forge</b>, sells permanent gear: more time, more Lore per kill, shields against death, and hints.</li>' +
-      '<li><b>Odile</b> imbues Lore into Legacy: every level adds Lore per kill, time on the clock and speed.</li>' +
-      '<li><b>Pell, the Merchant</b>, sells one-use items for your Satchel.</li></ul>' +
+      '<li><b>Tamsin, at the Forge</b>, sells permanent gear: more time, more Lore per kill, shields against death, and hints.</li>' +
+      '<li><b>Old Wick</b> imbues Lore into Legacy: every level adds Lore per kill, time on the clock and speed.</li>' +
+      '<li><b>Nettle, the peddler</b>, sells one-use items for your Satchel.</li></ul>' +
       '<p>Lore you <b>spend</b> is safe forever. Lore you <b>carry</b> is lost when you die. So fight, come back, and spend.</p>' +
       '<p class="muted">You can walk through this again any time from the Rules page at the bonfire.</p></div>',
       from === 'rules' ? 'Back to the Rules' : 'Enter the world', function () { exitTutorial(true); });
@@ -893,7 +893,7 @@
       onSave: function () { saveLocal(); } });
     if (UI.returnFrom) { if (UI.returnFrom.outcome !== 'died') Overworld.nudgeAway(UI.returnFrom.ref, UI.returnFrom.inst); UI.returnFrom = null; }
     try { var run = Overworld.run(); Sfx.ambient(run ? run.map.theme.name : null); } catch (e) {}
-    var bf = el('div', 'panel bonfire-card', portrait('fire', 'square') + '<div style="flex:1;min-width:200px"><b>Bonfire.</b> <span class="muted">Spend Lore with Bram at the Forge, with Pell the Merchant, and with Odile, who imbues Lore into Legacy. Lore you spend can never be lost; Lore you carry can.</span></div>');
+    var bf = el('div', 'panel bonfire-card', portrait('fire', 'square') + '<div style="flex:1;min-width:200px"><b>Bonfire.</b> <span class="muted">Spend Lore with Tamsin at the Forge, with Nettle the peddler, and with Old Wick, who imbues Lore into Legacy. Lore you spend can never be lost; Lore you carry can.</span></div>');
     var bfb = el('button', 'btn', 'Rest at the bonfire'); bfb.type = 'button'; bfb.onclick = function () { go('bonfire'); }; bf.appendChild(bfb);
     app.appendChild(bf);
     var best = el('details', 'bestiary'); best.innerHTML = '<summary>Creatures of this land</summary>';
@@ -1019,7 +1019,7 @@
       [['items', 'Items', have.length], ['book', 'Lorebook', pagesFound]].forEach(function (t) { var b = el('button', 'tab' + (tab === t[0] ? ' on' : ''), t[1] + ' <span class="ct">' + t[2] + '</span>'); b.type = 'button'; b.onclick = function () { tab = UI.satchelTab = t[0]; draw(); }; tabs.appendChild(b); });
       box.appendChild(tabs);
       if (tab === 'items') {
-        if (!have.length) box.appendChild(el('p', 'muted sh-empty', 'Nothing yet. Chests in the lands hold items, and Pell the Merchant sells them at every bonfire.'));
+        if (!have.length) box.appendChild(el('p', 'muted sh-empty', 'Nothing yet. Chests in the lands hold items, and Nettle the peddler sells them at every bonfire.'));
         have.sort(function (a, b) { return (a.permanent ? 1 : 0) - (b.permanent ? 1 : 0); });
         have.forEach(function (it) {
           var card = el('div', 'sh-item', itemCard(it, (it.where === 'battle' ? 'Use in a fight' : it.where === 'world' ? 'Use in a land' : 'Works on its own') + (it.permanent ? ' · always in your Satchel' : ' · you carry ' + itemCount(it.id))));
@@ -1115,7 +1115,7 @@
   }
   function stagePlay(who, anim) { var a = Stage[who]; if (!a) return; a.anim = anim; a.t0 = nowS(); }
   function stageHurt(who) { var a = Stage[who]; if (a) a.hurt = nowS(); }
-  // a killing blow that something stopped: 'knight' (the class's parry), 'shield' (Bone Shield, shatters) or 'draught' (a potion)
+  // a killing blow that something stopped: 'knight' (the class's parry), 'shield' (Barrel-lid Shield, splinters) or 'draught' (a potion)
   function stageWard(kind) { Stage.ward = { kind: kind, t0: nowS() }; if (!Stage.raf && Stage.cv) Stage.raf = requestAnimationFrame(stageFrame); }
   function drawWard(ctx, w, cx, cy, size, t) {
     var e = t - w.t0, D = w.kind === 'shield' ? 1.6 : 1.4; if (e < 0 || e > D) return;
@@ -1135,7 +1135,7 @@
       ctx.restore(); return; }
     function shieldPath(c, s) { c.beginPath(); c.moveTo(-s * 0.62, -s * 0.72); c.quadraticCurveTo(0, -s * 0.9, s * 0.62, -s * 0.72); c.lineTo(s * 0.62, -s * 0.1); c.quadraticCurveTo(s * 0.55, s * 0.55, 0, s * 0.95); c.quadraticCurveTo(-s * 0.55, s * 0.55, -s * 0.62, -s * 0.1); c.closePath(); }
     var sc = 0.55 + 0.45 * (1 - Math.pow(1 - pop, 3)), sz = size * sc;
-    var crack = w.kind === 'shield' ? Math.max(0, (e - 0.55) / 0.8) : 0; // the Bone Shield breaks apart
+    var crack = w.kind === 'shield' ? Math.max(0, (e - 0.55) / 0.8) : 0; // the shield breaks apart
     var parts = crack > 0 ? [[-1, -1], [1, -1], [-1, 1], [1, 1]] : [[0, 0]];
     parts.forEach(function (pt, pi) {
       ctx.save(); ctx.translate(cx + pt[0] * crack * size * 1.1, cy + pt[1] * crack * size * 0.6 + crack * crack * size * 1.4); ctx.rotate(pt[0] * crack * 0.9);
@@ -1228,14 +1228,14 @@
           (q.note ? '<p class="muted fh-note">' + q.note + '</p>' : '') + '</div>'));
       }
       if (B.phase === 'sight') {
-        var sp = el('div', 'result lose', '<h2>Your answer was wrong</h2><p>Second Sight flickers. Spend its charge to try this question once more, or accept your fate.</p>');
+        var sp = el('div', 'result lose', '<h2>Your answer was wrong</h2><p>The Crow\'s Eye flickers. Spend its charge to try this question once more, or accept your fate.</p>');
         var row = el('div', 'actions');
-        var use = el('button', 'btn lore', 'Use Second Sight (1 charge)'); use.type = 'button'; use.onclick = function () { S.gear.sight.charges--; B.sightUsed = true; B.phase = 'ask'; armTimer(); render(); };
+        var use = el('button', 'btn lore', 'Use the Crow\'s Eye (1 charge)'); use.type = 'button'; use.onclick = function () { S.gear.sight.charges--; B.sightUsed = true; B.phase = 'ask'; armTimer(); render(); };
         var no = el('button', 'btn ghost', 'Accept fate'); no.type = 'button'; no.onclick = function () { stagePlay('hero', 'death'); die(); };
         row.appendChild(use); row.appendChild(no); sp.appendChild(row); qp.appendChild(sp);
       }
-      if (B.hintShown) qp.appendChild(el('div', 'aid', '<div class="eyebrow">' + (B.freeHint === 'insight' ? 'Quick study · the Apprentice sees the way in' : B.freeHint ? 'Scholar\'s Lens' : 'Lantern of Hints') + '</div>' + esc(q.hint)));
-      if (B.tomeQ) qp.appendChild(el('div', 'aid', '<div class="eyebrow">Scholar\'s Tome · a similar problem, worked</div><div class="question" style="font-size:17px">' + B.tomeQ.prompt + '</div><div class="solution"><div class="eyebrow">Solution</div>' + B.tomeQ.solution + '</div>'));
+      if (B.hintShown) qp.appendChild(el('div', 'aid', '<div class="eyebrow">' + (B.freeHint === 'insight' ? 'Quick study · the Apprentice sees the way in' : B.freeHint ? 'Owl-glass' : 'Tallow Lantern') + '</div>' + esc(q.hint)));
+      if (B.tomeQ) qp.appendChild(el('div', 'aid', '<div class="eyebrow">Road Almanac · a similar problem, worked</div><div class="question" style="font-size:17px">' + B.tomeQ.prompt + '</div><div class="solution"><div class="eyebrow">Solution</div>' + B.tomeQ.solution + '</div>'));
       if (B.phase !== 'sight') {
         var ar = el('div', 'answer-row'); ar.appendChild(el('label', null, 'Your answer'));
         var mf = mathInput(); ar.appendChild(mf.node); qp.appendChild(ar);
@@ -1245,8 +1245,8 @@
         var atk = el('button', 'btn big', 'Strike'); atk.type = 'button'; atk.onclick = function () { submit(mf.value()); }; acts.appendChild(atk);
         mf.onEnter(function () { submit(mf.value()); });
         if (owns('lantern') && !B.hintShown) { var hb = el('button', 'btn ghost', 'Lantern: hint (Lore ×0.75)'); hb.type = 'button'; hb.onclick = function () { B.hintShown = true; B.used.hint = true; render(); }; acts.appendChild(hb); }
-        if (itemCount('lens') > 0 && !B.hintShown && !B.practice) { var lb = el('button', 'btn ghost', 'Scholar\'s Lens: free hint (' + itemCount('lens') + ')'); lb.type = 'button'; lb.onclick = function () { useItem('lens'); }; acts.appendChild(lb); }
-        if (itemCount('hourglass') > 0 && B.deadline && !B.practice) { var gb = el('button', 'btn ghost', 'Hourglass: +60 s (' + itemCount('hourglass') + ')'); gb.type = 'button'; gb.onclick = function () { useItem('hourglass'); }; acts.appendChild(gb); }
+        if (itemCount('lens') > 0 && !B.hintShown && !B.practice) { var lb = el('button', 'btn ghost', 'Owl-glass: free hint (' + itemCount('lens') + ')'); lb.type = 'button'; lb.onclick = function () { useItem('lens'); }; acts.appendChild(lb); }
+        if (itemCount('hourglass') > 0 && B.deadline && !B.practice) { var gb = el('button', 'btn ghost', 'Slow Sand: +60 s (' + itemCount('hourglass') + ')'); gb.type = 'button'; gb.onclick = function () { useItem('hourglass'); }; acts.appendChild(gb); }
         if (owns('tome') && !B.tomeQ) { var tb = el('button', 'btn ghost', 'Tome: worked example (Lore ×0.5)'); tb.type = 'button'; tb.onclick = function () { B.tomeQ = QGen.make(q.key); B.used.tome = true; render(); }; acts.appendChild(tb); }
         acts.appendChild(el('span', 'spacer'));
         var fl = el('button', 'btn ghost', B.tutorial ? 'Back away' : B.practice ? 'Leave practice' : 'Flee (lose half your Lore)'); fl.type = 'button'; fl.onclick = function () { flee(); }; acts.appendChild(fl);
@@ -1331,8 +1331,8 @@
       : '<div class="ward-emblem"><svg viewBox="0 0 40 46" aria-hidden="true"><path d="M5 6 Q20 1 35 6 L35 20 Q34 36 20 44 Q6 36 5 20 Z" /><path class="x" d="M20 9 V38 M10 17 H30" /></svg></div>';
     var why = B.timedOut ? 'The clock ran out' : 'That answer was wrong';
     var parts = how === 'knight' ? ['Saved by your Squire\'s parry · a 1-in-' + Math.round(1 / KNIGHT_HOLD) + ' chance', 'You turn the blow aside', why + ', and the blow should have killed you, but you caught it on your shield.', '']
-      : how === 'draught' ? ['Saved by an Ember Draught · one used', 'You drink the Ember Draught', why + '. Fire in your throat, and the blow that should have killed you lands on nothing.', ' The draught is gone.']
-      : ['Saved by your Bone Shield · its charge is spent', 'Your Bone Shield shatters', why + ', and the blow that should have killed you broke on the shield.', ' Recharge the shield at a bonfire.'];
+      : how === 'draught' ? ['Saved by a Quench Tonic · one used', 'You drink the Quench Tonic', why + '. It tastes like a hot horseshoe, and the blow that should have killed you lands on nothing.', ' The tonic is gone.']
+      : ['Saved by your Barrel-lid Shield · its charge is spent', 'Your Barrel-lid Shield splinters', why + ', and the blow that should have killed you broke on the shield.', ' Recharge the shield at a bonfire.'];
     var res = el('div', 'result warn ward ward-' + how, '<div class="ward-head">' + emblem + '<div><div class="eyebrow">' + parts[0] + '</div><h2>' + parts[1] + '</h2></div></div>' +
       '<p>' + parts[2] + ' You live, and you keep your Lore.' + parts[3] + '</p><p class="ward-still">This is not a win: ' + foe + ' still stands where you left it. Face it again when you are ready.</p>' + youTyped(B) + solutionBlock(q));
     res.appendChild(afterActions(false)); B.result = res; render();
@@ -1341,10 +1341,10 @@
     var B = UI.battle, q = B.qs[B.i], foe = B.foe;
     S.deaths++; S.streak = 0; S.losses[foe.id] = (S.losses[foe.id] || 0) + 1; sfx('death');
     var had = S.lore, keep = owns('satchel') ? Math.floor(had * 0.25) : 0, drop = had - keep, notes = [];
-    if (keep) notes.push('Your Lorekeeper\'s Satchel holds on to ' + n(keep) + ' Lore.');
+    if (keep) notes.push('Your Waymarker\'s Pouch holds on to ' + n(keep) + ' Lore.');
     if (S.dropped) {
-      if (charges('phoenix') > 0) { S.gear.phoenix.charges--; drop += S.dropped.amount; notes.push('The Phoenix Sigil burns: the ' + n(S.dropped.amount) + ' Lore already on the ground joins this pile instead of vanishing.'); }
-      else if (itemCount('feather') > 0) { S.items.feather--; drop += S.dropped.amount; notes.push('The Phoenix Feather burns: the ' + n(S.dropped.amount) + ' Lore already on the ground joins this pile instead of vanishing.'); }
+      if (charges('phoenix') > 0) { S.gear.phoenix.charges--; drop += S.dropped.amount; notes.push('The Dawnember Sigil flares: the ' + n(S.dropped.amount) + ' Lore already on the ground joins this pile instead of vanishing.'); }
+      else if (itemCount('feather') > 0) { S.items.feather--; drop += S.dropped.amount; notes.push('The Firecrow Feather burns: the ' + n(S.dropped.amount) + ' Lore already on the ground joins this pile instead of vanishing.'); }
       else { S.lostForever += S.dropped.amount; notes.push('The ' + n(S.dropped.amount) + ' Lore you had left at ' + esc((creatureById(landById(S.dropped.land), S.dropped.creature) || {}).name || 'the grave') + ' is <b>lost forever</b>.'); }
     }
     S.dropped = drop > 0 ? { amount: drop, creature: foe.id, land: B.land.id, inst: B.inst } : null;
@@ -1629,7 +1629,7 @@
     if (tab === 'gear' || tab === 'level' || tab === 'shop' || tab === 'book' || tab === 'beast' || tab === 'ach' || tab === 'board') {} else tab = 'camp';
     var bkey = Lc && (Lc.banner || (Lc.id === 'L1' ? 'title' : null));
     if (bkey && window.ART_IMG && ART_IMG[bkey]) { var bd = el('div', 'camp-backdrop'); bd.style.backgroundImage = 'url(' + ART_IMG[bkey] + ')'; app.appendChild(bd); }
-    var TILES = [['gear', 'The Forge', 'Bram the blacksmith\'s permanent upgrades, in six branches.'], ['level', 'Imbue Lore into Legacy', 'Odile turns the Lore you spend into strength.'], ['shop', 'The Merchant', 'Pell\'s one-use wares for the Satchel.'], ['book', 'Lorebook', 'Read the pages you have found.'], ['beast', 'Bestiary', 'Fight creatures you have met, with nothing at stake.'], ['ach', 'Achievements', 'Deeds the Chronicle remembers.'], ['board', 'Leaderboard', 'Where your hero stands among your class.'], ['chronicle', 'Chronicle', 'Your record, by outcome.'], ['help', 'Rules', 'The rules of the world.']];
+    var TILES = [['gear', 'The Forge', 'Tamsin the road-smith\'s permanent upgrades, in six branches.'], ['level', 'Imbue Lore into Legacy', 'Old Wick lights a lamp of your Legacy with the Lore you spend.'], ['shop', 'The Merchant', 'Nettle\'s one-use wares for the Satchel.'], ['book', 'Lorebook', 'Read the pages you have found.'], ['beast', 'Bestiary', 'Fight creatures you have met, with nothing at stake.'], ['ach', 'Achievements', 'Deeds the Chronicle remembers.'], ['board', 'Leaderboard', 'Where your hero stands among your class.'], ['chronicle', 'Chronicle', 'Your record, by outcome.'], ['help', 'Rules', 'The rules of the world.']];
     if (tab !== 'camp') { // entering one of the camp's places: a full-width painting, then its contents
       var cur = TILES.filter(function (t) { return t[0] === tab; })[0];
       var kp = window.KEEPERS && KEEPERS[tab]; // the keeper's word, laid over their banner beside them
@@ -1980,13 +1980,13 @@
       '<li><b>Every boss is a seal on the road.</b> Slay the boss of a land and the road opens to the next one. Far to the west, at the end of the road, waits the realm of Lorebound.</li>' +
       '<li><b>To fight is to answer.</b> Right answer: the creature dies and you earn Lore. Wrong answer: you die.</li>' +
       '<li><b>When you die, the Lore you were carrying drops where you fell.</b> Defeat that same creature to take it back. If you die anywhere before you do, that Lore is gone forever.</li>' +
-      '<li><b>Lore you spend is safe.</b> Rest at a bonfire and let Odile <b>imbue Lore into Legacy</b> (level up: more Lore per kill, more time per question, faster feet) and buy gear from Bram at the Forge: Ward keeps you alive, Insight helps you understand, Greed pays more, Swiftness outruns, Patience slows the clock. Tier 2 needs level ' + LEVEL.gate[2] + '; tier 3 needs level ' + LEVEL.gate[3] + ' and a boss kill.</li>' +
+      '<li><b>Lore you spend is safe.</b> Rest at a bonfire and let Old Wick <b>imbue Lore into Legacy</b> (level up: more Lore per kill, more time per question, faster feet) and buy gear from Tamsin at the Forge: Ward keeps you alive, Insight helps you understand, Greed pays more, Swiftness outruns, Patience slows the clock. Tier 2 needs level ' + LEVEL.gate[2] + '; tier 3 needs level ' + LEVEL.gate[3] + ' and a boss kill.</li>' +
       '<li><b>The Satchel</b> holds items (from chests, or bought as Provisions) and every page of the Lorebook you have found. Open it any time, even in a fight.</li>' +
       '<li><b>Chests</b> hold Lore, or an item — or a trap. Mimics bite, moths eat Lore, alarms bring every creature nearby. <b>Pages</b> teach the math of the land they are hidden in.</li>' +
       '<li><b>Win streaks pay.</b> Every kill in a row adds 5% (up to +50%). A death resets it.</li>' +
       '<li><b>Answers must be in the form asked for.</b> A right value in the wrong form staggers the creature once; the second time it kills you.</li>' +
       '<li><b>Strike first.</b> Walk up to a creature and attack it (<kbd>E</kbd> or ⚔) before it reaches you, and you get ' + FIRST_STRIKE + ' extra seconds on the clock. If it catches you first, you lose ' + FIRST_STRIKE + ' seconds. Bosses are always challenged, so their clocks never change.</li>' +
-      '<li><b>Stay in the fight.</b> Clicking away to another tab, window or app in the middle of a fight (a calculator app or website included) loses it, just like a wrong answer. Use a handheld calculator, or the game\'s own <b>Calculator</b> in the top bar (press <kbd>C</kbd>): it has the same keys as the TI-30XIIS and is safe to use mid-fight. <b>Fleeing</b> a fight costs half the Lore you carry, and closing or reloading the game in the middle of a fight counts as fleeing. Leave the game while out in a land and you come back exactly where you stood. To get home from deep in a land, crush the <b>Cinder of Return</b> that every Satchel holds (it burns all the Lore you carry), or buy a <b>Homeward Ember</b> from Callum the Merchant (it keeps your Lore).</li>' +
+      '<li><b>Stay in the fight.</b> Clicking away to another tab, window or app in the middle of a fight (a calculator app or website included) loses it, just like a wrong answer. Use a handheld calculator, or the game\'s own <b>Calculator</b> in the top bar (press <kbd>C</kbd>): it has the same keys as the TI-30XIIS and is safe to use mid-fight. <b>Fleeing</b> a fight costs half the Lore you carry, and closing or reloading the game in the middle of a fight counts as fleeing. Leave the game while out in a land and you come back exactly where you stood. To get home from deep in a land, crush the <b>Last-light Cinder</b> that every Satchel holds (it burns all the Lore you carry), or buy a <b>Homing Wick</b> from Nettle the peddler (it keeps your Lore).</li>' +
       '<li><b>Every class has an edge.</b> Squire: a 1 in 10 chance to parry a killing blow. Apprentice: a 1 in 5 chance the hint appears free. Bandit: 50% more time on the clock. Vagabond: the right value counts even in the wrong form. To rename your hero (free) or take up another class (' + n(CLASS_CHANGE_COST) + ' Lore), go to Imbue Lore into Legacy at the bonfire.</li>' +
       '<li><b>The clock.</b> Each question has a time limit (Beginning ' + LEVELS.BEG.time + ' s, Progressing ' + LEVELS.PRG.time + ' s, Mastery and bosses ' + LEVELS.MAS.time + ' s, longer with levels and Patience gear). Out of time counts as a wrong answer.</li>' +
       '<li><b>The lands are labyrinths.</b> Creatures roam them in packs and chase you when they see you — but you are faster. A slain creature leaves a corpse. Die, or rest at the bonfire, and every corpse rises again. The boss door needs the Gate Key and every kind of creature slain once.</li>' +
@@ -2573,5 +2573,6 @@
   if (window.LOREBOUND_DEBUG === true) { window.Lorebound.battle = function () { return UI.battle; }; window.Lorebound.go = go;
     window.Lorebound.fight = function (i, strike) { var L = landById(UI.land || S.lastLand); startBattle(L, L.creatures[i], false, 0, false, strike); };
     window.Lorebound.duel = function () { return UI.duel; }; window.Lorebound.duelQ = function () { return UI.duel && UI.duel.view && UI.duel.view.seed ? duelQuestion(UI.duel.view) : null; };
-    window.Lorebound.fightBoss = function () { var L = landById(UI.land || S.lastLand); startBattle(L, L.boss, true); }; }
+    window.Lorebound.fightBoss = function () { var L = landById(UI.land || S.lastLand); startBattle(L, L.boss, true); };
+    window.Lorebound.state = function () { return S; }; window.Lorebound.camp = function (tab) { UI.bonfireTab = tab || 'camp'; go('bonfire'); UI.bonfireTab = tab || 'camp'; render(); }; }
 })();

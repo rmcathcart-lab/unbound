@@ -9,6 +9,9 @@ FLY = next((float(a.split('=')[1]) for a in sys.argv if a.startswith('--fly=')),
 ANIMS = next((a.split('=', 1)[1] for a in sys.argv if a.startswith('--anims=')), 'idle:6:1,walk:9:1,attack:10:0,death:8:0')
 ANIMS = [(x.split(':')[0], int(x.split(':')[1]), x.split(':')[2] == '1') for x in ANIMS.split(',')]
 NR = len(ANIMS)
+# --blobs: cut frames along each figure's own outline (connected pixels) instead of by columns, for sheets where a prop
+#   (a lantern on a pole, a spell) reaches past the even spacing into the next frame's column
+BLOBS = '--blobs' in sys.argv
 # --counts=6,8  frames per row when rows legitimately differ (otherwise every row is cut to the most common count)
 COUNTS = next(([int(v) for v in a.split('=')[1].split(',')] for a in sys.argv if a.startswith('--counts=')), None)
 sys.argv = [a for a in sys.argv if not a.startswith('--')]
@@ -81,7 +84,26 @@ for ri_, (y0, y1) in enumerate(rows):
 from collections import Counter
 expect = Counter(len(b[3]) for b in band_cols).most_common(1)[0][0]
 normw = sorted(c[1] - c[0] for b in band_cols if len(b[3]) == expect for c in b[3]); normw = normw[len(normw) // 2]
+blobmask = {}
+if BLOBS:
+    band_cols = []
+    for ri_, (y0, y1) in enumerate(rows):
+        lab, n = ndi.label(ndi.binary_dilation(M[y0:y1], iterations=3)); sz = ndi.sum(M[y0:y1], lab, range(1, n + 1))
+        want = COUNTS[ri_] if COUNTS else n; objs = ndi.find_objects(lab)
+        keep = sorted(sorted(range(1, n + 1), key=lambda k: -sz[k - 1])[:want], key=lambda k: objs[k - 1][1].start)
+        own = {k: lab == k for k in keep}
+        dist = {k: ndi.distance_transform_edt(~own[k]) for k in keep}
+        for j in range(1, n + 1):   # loose pieces (a lantern on a keyed-away chain) join the nearest figure
+            if j in own or sz[j - 1] < 150: continue
+            cy, cx = ndi.center_of_mass(lab == j); best = min(keep, key=lambda k: dist[k][int(cy), int(cx)])
+            if dist[best][int(cy), int(cx)] < 120: own[best] = own[best] | (lab == j)
+        cols = []
+        for k in keep:
+            ys_, xs_ = np.where(own[k]); cols.append([xs_.min(), xs_.max() + 1])
+            blobmask[(ri_, xs_.min())] = (y0, own[k])
+        band_cols.append((ri_, y0, y1, cols))
 for ri_, y0, y1, cols in band_cols:
+    if BLOBS: [frames_src.append((ri_, c[0], y0, c[1], y1)) for c in cols]; continue
     if COUNTS: expect = COUNTS[ri_]
     if len(cols) != expect or max(c[1] - c[0] for c in cols) > 1.6 * normw:
         # frames touch (spell beams, dust trails): the generator spaces frames evenly, so cut at the emptiest
@@ -109,7 +131,12 @@ def clean(cell):
 tiles = []
 for r, x0, y0, x1, y1 in frames_src:
     pad = 4; X0, Y0, X1, Y1 = max(0, x0 - pad), max(0, y0 - pad), min(W, x1 + pad), min(H, y1 + pad)
-    cell = clean(rgba[Y0:Y1, X0:X1].copy()); m = cell[..., 3] > 40
+    cell = rgba[Y0:Y1, X0:X1].copy()
+    if BLOBS:   # only this figure's own pixels (a neighbour's lantern or staff may poke into the box)
+        by0, bm = blobmask[(r, x0)]; full = np.zeros((H, W), bool); full[by0:by0 + bm.shape[0]] = bm
+        cell[..., 3] = np.where(full[Y0:Y1, X0:X1], cell[..., 3], 0)
+    else: cell = clean(cell)
+    m = cell[..., 3] > 40
     ys, xs = np.where(m); bx0, by0, bx1, by1 = xs.min(), ys.min(), xs.max() + 1, ys.max() + 1
     tiles.append(dict(r=r, cell=cell, bb=(bx0, by0, bx1, by1)))
 ih = np.median([t['bb'][3] - t['bb'][1] for t in tiles if t['r'] == 0]); s = TH / ih

@@ -41,62 +41,68 @@ var FINAL_ID = 'L9'; // no final land yet
 
 /* Gear: five branches, three tiers. Tier 2 needs tier 1 and level 3; tier 3 needs tier 2, level 6 and a boss kill. */
 var GEAR = [
-  { id: 'boots', branch: 'Swiftness', tier: 1, name: 'Furrow-strider Boots', cost: 120,
+  { id: 'boots', branch: 'Swiftness', tier: 1, name: 'Roadwalker Boots', cost: 120,
     desc: 'You walk 12% faster in every land. Creatures do not.' },
-  { id: 'cloak', branch: 'Swiftness', tier: 2, name: 'Cloak of Reeds', cost: 280, needs: 'boots',
+  { id: 'cloak', branch: 'Swiftness', tier: 2, name: 'Hedge Cloak', cost: 280, needs: 'boots',
     desc: 'Creatures only notice you from five tiles away instead of six and a half. Sneak past the ones you are not ready for.' },
-  { id: 'ghost', branch: 'Swiftness', tier: 3, name: 'Ghost Step', cost: 550, needs: 'cloak', boss: true,
+  { id: 'ghost', branch: 'Swiftness', tier: 3, name: "Fogwalker's Step", cost: 550, needs: 'cloak', boss: true,
     desc: 'Another 8% of speed, and anything chasing you gives up after one second out of sight instead of two and a half.' },
-  { id: 'sundial', branch: 'Patience', tier: 1, name: 'Pocket Sundial', cost: 100,
+  { id: 'sundial', branch: 'Patience', tier: 1, name: 'Candle Clock', cost: 100,
     desc: 'Every question clock runs 20% longer.' },
-  { id: 'lichglass', branch: 'Patience', tier: 2, name: "Lich's Hourglass", cost: 260, needs: 'sundial',
-    desc: 'Every question clock runs 40% longer (replaces the sundial\'s 20%).' },
-  { id: 'stillness', branch: 'Patience', tier: 3, name: 'Stillness', cost: 520, needs: 'lichglass', boss: true,
+  { id: 'lichglass', branch: 'Patience', tier: 2, name: 'Brass Water-clock', cost: 260, needs: 'sundial',
+    desc: 'Every question clock runs 40% longer (replaces the candle clock\'s 20%).' },
+  { id: 'stillness', branch: 'Patience', tier: 3, name: 'Stopped Millwheel', cost: 520, needs: 'lichglass', boss: true,
     desc: 'Every question clock runs 75% longer. Time is a suggestion.' },
-  { id: 'shield', branch: 'Ward', tier: 1, name: 'Bone Shield', cost: 120, charges: 1, recharge: 60,
-    desc: 'Absorbs one death. When a wrong answer would kill you, the shield shatters instead: no Lore lost, but the creature stands.', use: 'Recharge at any bonfire.' },
-  { id: 'satchel', branch: 'Ward', tier: 2, name: "Lorekeeper's Satchel", cost: 300, needs: 'shield',
+  { id: 'shield', branch: 'Ward', tier: 1, name: 'Barrel-lid Shield', cost: 120, charges: 1, recharge: 60,
+    desc: 'Absorbs one death. When a wrong answer would kill you, the shield splinters instead: no Lore lost, but the creature stands.', use: 'Recharge at any bonfire.' },
+  { id: 'satchel', branch: 'Ward', tier: 2, name: "Waymarker's Pouch", cost: 300, needs: 'shield',
     desc: 'When you die you keep a quarter of the Lore you were carrying. The rest drops where you fell.' },
-  { id: 'phoenix', branch: 'Ward', tier: 3, name: 'Phoenix Sigil', cost: 600, needs: 'satchel', boss: true, charges: 1, recharge: 200,
+  { id: 'phoenix', branch: 'Ward', tier: 3, name: 'Dawnember Sigil', cost: 600, needs: 'satchel', boss: true, charges: 1, recharge: 200,
     desc: 'If you die while Lore still lies on the ground, the sigil burns and that Lore joins your new pile instead of vanishing forever.', use: 'Recharge at any bonfire.' },
-  { id: 'lantern', branch: 'Insight', tier: 1, name: 'Lantern of Hints', cost: 100,
+  { id: 'lantern', branch: 'Insight', tier: 1, name: 'Tallow Lantern', cost: 100,
     desc: 'Reveal a hint during any fight. A fight where you used the lantern is worth three quarters of its Lore.' },
-  { id: 'tome', branch: 'Insight', tier: 2, name: "Scholar's Tome", cost: 250, needs: 'lantern',
-    desc: 'Opens to a fully worked example of the same kind of problem, with different numbers. A fight where you read the tome is worth half its Lore.' },
-  { id: 'sight', branch: 'Insight', tier: 3, name: 'Second Sight', cost: 500, needs: 'tome', boss: true, charges: 1, recharge: 150,
+  { id: 'tome', branch: 'Insight', tier: 2, name: 'Road Almanac', cost: 250, needs: 'lantern',
+    desc: 'Opens to a fully worked example of the same kind of problem, with different numbers. A fight where you read the almanac is worth half its Lore.' },
+  { id: 'sight', branch: 'Insight', tier: 3, name: "Crow's Eye", cost: 500, needs: 'tome', boss: true, charges: 1, recharge: 150,
     desc: 'When a wrong answer would kill you, see the future and take one more attempt at the same question.', use: 'Recharge at any bonfire.' },
-  { id: 'blade', branch: 'Greed', tier: 1, name: 'Runed Blade', cost: 150,
+  { id: 'blade', branch: 'Greed', tier: 1, name: 'Whetted Sickle', cost: 150,
     desc: 'Every kill is worth 25% more Lore.' },
-  { id: 'mark', branch: 'Greed', tier: 2, name: "Hunter's Mark", cost: 350, needs: 'blade',
+  { id: 'mark', branch: 'Greed', tier: 2, name: "Poacher's Tally", cost: 350, needs: 'blade',
     desc: 'Progressing and Mastery creatures are worth 50% more Lore on top of the blade.' },
-  { id: 'crown', branch: 'Greed', tier: 3, name: 'Crown of Ash', cost: 700, needs: 'mark', boss: true,
+  { id: 'crown', branch: 'Greed', tier: 3, name: 'Briar Crown', cost: 700, needs: 'mark', boss: true,
     desc: 'Bosses are worth double. Your win streak now adds 10% per kill (up to +100%) instead of 5% (up to +50%).' },
   /* Regalia: cosmetic only. Nothing here helps in a fight; it changes how your hero is shown. */
-  { id: 'frame_ember', branch: 'Regalia', tier: 1, name: 'Ember-gilt Frame', cost: 150, cosmetic: true, frame: 'ember',
-    desc: 'Your portrait is set in a frame of smouldering bronze.' },
-  { id: 'frame_lore', branch: 'Regalia', tier: 2, name: 'Lore-light Frame', cost: 350, cosmetic: true, frame: 'lore',
-    desc: 'Your portrait glows with the pale blue light of banked Lore.' },
-  { id: 'frame_gold', branch: 'Regalia', tier: 3, name: 'Frame of the Archlich', cost: 800, cosmetic: true, frame: 'gold', boss: true,
-    desc: 'Gold and bone, torn from the throne of a slain boss. Needs a boss kill.' }
+  { id: 'frame_ember', branch: 'Regalia', tier: 1, name: 'Copper Wayframe', cost: 150, cosmetic: true, frame: 'ember',
+    desc: 'Your portrait is set in a frame of hammered copper that glows like coals.' },
+  { id: 'frame_lore', branch: 'Regalia', tier: 2, name: 'Lamplit Frame', cost: 350, cosmetic: true, frame: 'lore',
+    desc: 'Your portrait is hung with little lamps from Old Wick\'s shrine, burning the pale blue of banked Lore.' },
+  { id: 'frame_gold', branch: 'Regalia', tier: 3, name: 'Bonegilt Frame', cost: 800, cosmetic: true, frame: 'gold', boss: true,
+    desc: 'Gold set with carved bone and antler: the prize of a slain boss. Needs a boss kill.' }
 ];
 
-/* The keepers of every bonfire. Each greets the hero with one of their lines when their page opens. */
+/* The keepers of every bonfire on the road west. Each greets the hero with one of their lines when their page opens.
+ * Tamsin Coalbrook, the road-smith: apprenticed in the Hollowdeep Mines until the deep shafts went quiet; now hauls her forge on a
+ *   wagon behind a mule called Ingot, hammering scrap into gear for anyone walking toward Lorebound (the Cart Forge).
+ * Old Wick, the lamplighter: has lit the lanterns along the road for longer than anyone remembers; blind, he sees people by the Lore
+ *   they carry, and lights a lamp of Legacy for each hero (the Lamp Shrine, a waystone ringed with lanterns).
+ * Nettle, the peddler: carries her whole shop on her back in a pack of a hundred little drawers, taller than she is; claims to have
+ *   walked to Lorebound and back three times (Nettle's Pack, set down on a milestone by the fire). */
 var KEEPERS = {
-  gear: { name: 'Bram', role: 'the blacksmith', lines: [
-    'Measure twice, forge once. Then measure again, because you rounded.',
-    'Steel is only iron that showed its work.',
-    'Bring me Lore and I will bring you an edge. Bring me excuses and I will bring you a broom.',
-    'Every blade here is balanced like an equation: what comes off one side comes off the other.'] },
-  level: { name: 'Odile', role: 'keeper of Legacy', lines: [
-    'Every level is a sum you have already paid. I only write down the total.',
-    'Lore you carry can be lost. Lore you give to me becomes part of you.',
-    'Hold still. The constellations are fussy about their order of operations.',
-    'Every Mythic I have known began at level one.'] },
-  shop: { name: 'Pell', role: 'the merchant', lines: [
-    'Everything is for sale and every price is exact. I do not do estimates.',
-    'Homeward Embers! Get them while they last. They always last. I have crates of them.',
-    'No refunds, no haggling, no negative numbers.',
-    'A wise hero buys a Lens before the fight, not after it.'] }
+  gear: { name: 'Tamsin', role: 'the road-smith', lines: [
+    'Measure twice, hammer once. Then check your units.',
+    'I learned the trade a mile under the Hollowdeep. Up here, at least the sparks have somewhere to go.',
+    'Ingot does not like the road either. Pay me, not the mule.',
+    'Every edge I make runs straight from tip to hilt. The shortest distance between two points, as it should be.'] },
+  level: { name: 'Old Wick', role: 'the lamplighter', lines: [
+    'I cannot see your face, child, but I can see your Lore. It flickers like a candle in a draught.',
+    'Every lamp on this road is someone who kept going. Yours is waiting for a flame.',
+    'Lore you carry can be lost. Lore you give the lamp stays lit.',
+    'Sixty years of lighting lamps, and I have never once lost count. Count with me.'] },
+  shop: { name: 'Nettle', role: 'the peddler', lines: [
+    'A hundred drawers, and I know what is in every one. Do not touch the drawer that hums.',
+    'Three times to Lorebound and back, and I still sell Homing Wicks at cost. Nearly at cost.',
+    'Exact change, please. I do not round, and I do not cut coins into fractions.',
+    'Buy an Owl-glass before the fight, dear, not after it. After is too late.'] }
 };
 
 /* Character level: bought with Lore at a bonfire. Every level adds +3% Lore from kills, +3% question time and a little speed. */
@@ -111,22 +117,22 @@ var LEVEL = {
 
 /* Consumables: found in chests, bought at the bonfire (Provisions), carried in the Satchel. */
 var ITEMS = [
-  { id: 'hourglass', name: 'Hourglass Shard', cost: 60, where: 'battle', weight: 25, art: 'item-hourglass',
-    desc: 'Turn it over during a fight: +60 seconds on the clock.', flavor: 'Sand from a lich\'s hourglass. It runs slower than it should.' },
-  { id: 'lens', name: "Scholar's Lens", cost: 90, where: 'battle', weight: 20, art: 'item-lens',
-    desc: 'Hold it to the question in front of you: a hint, with no cost to the Lore you earn.', flavor: 'Ground from the spectacles of a scholar who read the whole Lorebook and understood a third of it.' },
-  { id: 'smoke', name: 'Smoke Pellet', cost: 70, where: 'world', weight: 20, art: 'item-smoke',
-    desc: 'Crush it in a land: everything chasing you loses you at once and stays blind for a few seconds.', flavor: 'Chaff and ash, wrapped in a dead leaf.' },
-  { id: 'draught', name: 'Ember Draught', cost: 150, where: 'auto', weight: 15, art: 'item-draught',
-    desc: 'Carried into a fight, it is drunk the instant a wrong answer would kill you: you survive, keep your Lore, and the creature stands. One use.', flavor: 'Bram brews it in his quenching trough. It tastes like a forge, and it is drunk whether you want it or not.' },
-  { id: 'wisp', name: 'Wisp in a Jar', cost: 120, where: 'world', weight: 12, art: 'item-wisp',
-    desc: 'Open it in a land: the wisp flies the whole labyrinth and draws every path on your minimap.', flavor: 'It is not happy in there. It will be happier out.' },
-  { id: 'homeward', name: 'Homeward Ember', cost: 120, where: 'world', weight: 10, art: 'item-homeward',
-    desc: 'Breathe on it in any land and it carries you back to that land\'s bonfire, with every scrap of your Lore.', flavor: 'A coal from a bonfire that remembers where it was lit. Pell swears every one is his last.' },
-  { id: 'cinder', name: 'Cinder of Return', cost: 0, where: 'world', weight: 0, permanent: true, art: 'item-cinder',
+  { id: 'hourglass', name: 'Slow Sand', cost: 60, where: 'battle', weight: 25, art: 'item-hourglass',
+    desc: 'Pour it out during a fight: +60 seconds on the clock.', flavor: 'Sand from the bottom of the Salt Wastes. It has never once been in a hurry.' },
+  { id: 'lens', name: 'Owl-glass', cost: 90, where: 'battle', weight: 20, art: 'item-lens',
+    desc: 'Hold it to the question in front of you: a hint, with no cost to the Lore you earn.', flavor: 'An old owl looked through it for forty years. Some of the owl stayed in the glass.' },
+  { id: 'smoke', name: 'Chaff Bomb', cost: 70, where: 'world', weight: 20, art: 'item-smoke',
+    desc: 'Crush it in a land: everything chasing you loses you at once and stays blind for a few seconds.', flavor: 'Chaff and ash from the Hollow Fields, tied tight. One crush and the air is full of harvest.' },
+  { id: 'draught', name: 'Quench Tonic', cost: 150, where: 'auto', weight: 15, art: 'item-draught',
+    desc: 'Carried into a fight, it is drunk the instant a wrong answer would kill you: you survive, keep your Lore, and the creature stands. One use.', flavor: 'Tamsin brews it in her quenching bucket. It tastes like a hot horseshoe, and it is drunk whether you want it or not.' },
+  { id: 'wisp', name: 'Firefly Jar', cost: 120, where: 'world', weight: 12, art: 'item-wisp',
+    desc: 'Open it in a land: the fireflies fly the whole labyrinth and draw every path on your minimap.', flavor: 'They light every turn of the labyrinth for you, then wander home.' },
+  { id: 'homeward', name: 'Homing Wick', cost: 120, where: 'world', weight: 10, art: 'item-homeward',
+    desc: 'Blow on it in any land and it carries you back to that land\'s bonfire, with every scrap of your Lore.', flavor: 'A wick from one of Old Wick\'s lamps. It always finds its way back to the fire. Nettle swears every one is her last.' },
+  { id: 'cinder', name: 'Last-light Cinder', cost: 0, where: 'world', weight: 0, permanent: true, art: 'item-cinder',
     desc: 'Crush it in any land to wake at that land\'s bonfire. All the Lore you carry burns away for good. It never runs out.', flavor: 'Every hero is given one. Most are too proud to use it.' },
-  { id: 'feather', name: 'Phoenix Feather', cost: 200, where: 'auto', weight: 8, art: 'item-feather',
-    desc: 'If you die while Lore already lies on the ground, the feather burns instead of that Lore: it joins your new pile. One use.', flavor: 'Still warm.' }
+  { id: 'feather', name: 'Firecrow Feather', cost: 200, where: 'auto', weight: 8, art: 'item-feather',
+    desc: 'If you die while Lore already lies on the ground, the feather burns instead of that Lore: it joins your new pile. One use.', flavor: 'Dropped by a crow that flew too close to a bonfire. Still warm.' }
 ];
 
 /* What a chest holds is fixed per chest (same for every student) but unknown until opened. */

@@ -55,7 +55,7 @@
     if (t3 && Object.keys(S.bossKills).length) return 3;
     return t2 ? 2 : 1;
   }
-  function className(id) { var c = CLASSES.filter(function (x) { return x.id === id; })[0]; return c ? c.name : 'Knight'; }
+  function className(id) { var c = CLASSES.filter(function (x) { return x.id === id; })[0]; return c ? c.name : 'Squire'; }
   function classById(id) { return CLASSES.filter(function (c) { return c.id === id; })[0] || CLASSES[0]; }
   function heroClass() { var id = S && S.hero ? S.hero.cls : 'knight'; return CLASSES.filter(function (c) { return c.id === id; })[0] || CLASSES[0]; }
   function heroFrame() { var f = ''; GEAR.forEach(function (g) { if (g.cosmetic && g.frame && owns(g.id) && S.hero && S.hero.frame === g.id) f = g.frame; }); return f; }
@@ -757,11 +757,11 @@
     { t: 'Walk', d: 'Use <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or the arrow keys to walk. On a phone or tablet, drag the stick in the bottom corner. Head north up the path.', done: function (c) { return c.moved; } },
     { t: 'Open a chest', d: 'Chests hold Lore and items. Walk over the chest in the room ahead to open it.', done: function (c) { return c.chest; } },
     { t: 'Pick up a page', d: 'Pages of the Lorebook tell the story of the lands and teach the math. Walk over the glowing page to read it.', done: function (c) { return c.page; } },
-    { t: 'Strike first', d: 'A Training Rat is asleep in the room to the east. Walk right up to it and press <kbd>E</kbd> (or ⚔) to attack. Striking first adds 20 seconds to the clock.', done: function (c) { return c.slain['t-rat']; } },
+    { t: 'Strike first', d: 'A Training Crow is asleep in the room to the east. Walk right up to it and press <kbd>E</kbd> (or ⚔) to attack. Striking first adds 20 seconds to the clock.', done: function (c) { return c.slain['t-rat']; } },
     { t: 'Open your Satchel', d: 'Press <kbd>I</kbd> (or the Satchel button at the top) to open your Satchel. It holds your items and the pages you have found. Press <kbd>Esc</kbd> to close it.', done: function (c) { return c.satchel; } },
-    { t: 'Find the key', d: 'Every land hides the key to its boss gate. Search the room south of the rat. A Training Wisp is awake down there and will chase you. If it reaches you before you strike, it ambushes you: 20 seconds come off the clock.', done: function (c) { return c.key; } },
-    { t: 'Clear the land', d: 'A boss gate only opens once every kind of creature in the land has been slain at least once. Slay the Training Wisp.', done: function (c) { return c.slain['t-wisp']; } },
-    { t: 'Challenge the boss', d: 'The gate east of the rat\'s room is open. Go in and challenge the Proving Golem. A boss asks several questions in a row, and you must answer them all.', done: function (c) { return c.slain['t-boss']; } },
+    { t: 'Find the key', d: 'Every land hides the key to its boss gate. Search the room south of the crow. A Training Husk is awake down there and will chase you. If it reaches you before you strike, it ambushes you: 20 seconds come off the clock.', done: function (c) { return c.key; } },
+    { t: 'Clear the land', d: 'A boss gate only opens once every kind of creature in the land has been slain at least once. Slay the Training Husk.', done: function (c) { return c.slain['t-wisp']; } },
+    { t: 'Challenge the boss', d: 'The gate east of the crow\'s room is open. Go in and challenge the Proving Golem. A boss asks several questions in a row, and you must answer them all.', done: function (c) { return c.slain['t-boss']; } },
     { t: 'Rest at the fire', d: 'When a boss falls, a fire kindles in its room, so you never have to walk the whole land back. Walk up to it and press <kbd>E</kbd> (or ⚔) to rest. In the lands, resting takes you to the bonfire, where you spend your Lore. The fire burns out once you have rested.', done: function () { return false; } }
   ];
   function startTutorial(from) {
@@ -1227,7 +1227,7 @@
         var no = el('button', 'btn ghost', 'Accept fate'); no.type = 'button'; no.onclick = function () { stagePlay('hero', 'death'); die(); };
         row.appendChild(use); row.appendChild(no); sp.appendChild(row); qp.appendChild(sp);
       }
-      if (B.hintShown) qp.appendChild(el('div', 'aid', '<div class="eyebrow">' + (B.freeHint === 'insight' ? 'Arcane insight · the Sorcerer sees the way in' : B.freeHint ? 'Scholar\'s Lens' : 'Lantern of Hints') + '</div>' + esc(q.hint)));
+      if (B.hintShown) qp.appendChild(el('div', 'aid', '<div class="eyebrow">' + (B.freeHint === 'insight' ? 'Quick study · the Apprentice sees the way in' : B.freeHint ? 'Scholar\'s Lens' : 'Lantern of Hints') + '</div>' + esc(q.hint)));
       if (B.tomeQ) qp.appendChild(el('div', 'aid', '<div class="eyebrow">Scholar\'s Tome · a similar problem, worked</div><div class="question" style="font-size:17px">' + B.tomeQ.prompt + '</div><div class="solution"><div class="eyebrow">Solution</div>' + B.tomeQ.solution + '</div>'));
       if (B.phase !== 'sight') {
         var ar = el('div', 'answer-row'); ar.appendChild(el('label', null, 'Your answer'));
@@ -1323,7 +1323,7 @@
     var emblem = art ? '<div class="ward-emblem art" style="background-image:url(' + art + ')"></div>'
       : '<div class="ward-emblem"><svg viewBox="0 0 40 46" aria-hidden="true"><path d="M5 6 Q20 1 35 6 L35 20 Q34 36 20 44 Q6 36 5 20 Z" /><path class="x" d="M20 9 V38 M10 17 H30" /></svg></div>';
     var why = B.timedOut ? 'The clock ran out' : 'That answer was wrong';
-    var parts = how === 'knight' ? ['Saved by your Knight\'s parry · a 1-in-' + Math.round(1 / KNIGHT_HOLD) + ' chance', 'You turn the blow aside', why + ', and the blow should have killed you, but you caught it on your blade.', '']
+    var parts = how === 'knight' ? ['Saved by your Squire\'s parry · a 1-in-' + Math.round(1 / KNIGHT_HOLD) + ' chance', 'You turn the blow aside', why + ', and the blow should have killed you, but you caught it on your shield.', '']
       : how === 'draught' ? ['Saved by an Ember Draught · one used', 'You drink the Ember Draught', why + '. Fire in your throat, and the blow that should have killed you lands on nothing.', ' The draught is gone.']
       : ['Saved by your Bone Shield · its charge is spent', 'Your Bone Shield shatters', why + ', and the blow that should have killed you broke on the shield.', ' Recharge the shield at a bonfire.'];
     var res = el('div', 'result warn ward ward-' + how, '<div class="ward-head">' + emblem + '<div><div class="eyebrow">' + parts[0] + '</div><h2>' + parts[1] + '</h2></div></div>' +
@@ -1980,7 +1980,7 @@
       '<li><b>Answers must be in the form asked for.</b> A right value in the wrong form staggers the creature once; the second time it kills you.</li>' +
       '<li><b>Strike first.</b> Walk up to a creature and attack it (<kbd>E</kbd> or ⚔) before it reaches you, and you get ' + FIRST_STRIKE + ' extra seconds on the clock. If it catches you first, you lose ' + FIRST_STRIKE + ' seconds. Bosses are always challenged, so their clocks never change.</li>' +
       '<li><b>Stay in the fight.</b> Clicking away to another tab, window or app in the middle of a fight (an on-screen calculator included) loses it, just like a wrong answer. Use a handheld calculator. <b>Fleeing</b> a fight costs half the Lore you carry, and closing or reloading the game in the middle of a fight counts as fleeing. Leave the game while out in a land and you come back exactly where you stood. To get home from deep in a land, crush the <b>Cinder of Return</b> that every Satchel holds (it burns all the Lore you carry), or buy a <b>Homeward Ember</b> from Callum the Merchant (it keeps your Lore).</li>' +
-      '<li><b>Every class has an edge.</b> Knight: a 1 in 10 chance to parry a killing blow. Sorcerer: a 1 in 5 chance the hint appears free. Ranger: 50% more time on the clock. Rogue: the right value counts even in the wrong form. To rename your hero (free) or take up another class (' + n(CLASS_CHANGE_COST) + ' Lore), go to Imbue Lore into Legacy at the bonfire.</li>' +
+      '<li><b>Every class has an edge.</b> Squire: a 1 in 10 chance to parry a killing blow. Apprentice: a 1 in 5 chance the hint appears free. Bandit: 50% more time on the clock. Vagabond: the right value counts even in the wrong form. To rename your hero (free) or take up another class (' + n(CLASS_CHANGE_COST) + ' Lore), go to Imbue Lore into Legacy at the bonfire.</li>' +
       '<li><b>The clock.</b> Each question has a time limit (Beginning ' + LEVELS.BEG.time + ' s, Progressing ' + LEVELS.PRG.time + ' s, Mastery and bosses ' + LEVELS.MAS.time + ' s, longer with levels and Patience gear). Out of time counts as a wrong answer.</li>' +
       '<li><b>The lands are labyrinths.</b> Creatures roam them in packs and chase you when they see you — but you are faster. A slain creature leaves a corpse. Die, or rest at the bonfire, and every corpse rises again. The boss door needs the Gate Key and every kind of creature slain once.</li>' +
       '<li><b>The boss</b> of a land opens once you have slain every creature there at least once. It asks several questions in a row; one wrong answer and you die.</li>' +

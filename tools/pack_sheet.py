@@ -4,24 +4,44 @@ import sys, json, io
 import numpy as np
 from PIL import Image, ImageFilter
 from scipy import ndimage as ndi
+FLY = next((float(a.split('=')[1]) for a in sys.argv if a.startswith('--fly=')), 0.0)
+# --anims=name:fps:loop,...  one per sheet row (default: the creature rows idle/walk/attack/death)
+ANIMS = next((a.split('=', 1)[1] for a in sys.argv if a.startswith('--anims=')), 'idle:6:1,walk:9:1,attack:10:0,death:8:0')
+ANIMS = [(x.split(':')[0], int(x.split(':')[1]), x.split(':')[2] == '1') for x in ANIMS.split(',')]
+NR = len(ANIMS)
+# --counts=6,8  frames per row when rows legitimately differ (otherwise every row is cut to the most common count)
+COUNTS = next(([int(v) for v in a.split('=')[1].split(',')] for a in sys.argv if a.startswith('--counts=')), None)
+sys.argv = [a for a in sys.argv if not a.startswith('--')]
 src, name, out = sys.argv[1], sys.argv[2], sys.argv[3]
 TH = float(sys.argv[4]) if len(sys.argv) > 4 else 96
 LH = float(sys.argv[5]) if len(sys.argv) > 5 else TH * 0.27083
 im = Image.open(src).convert('RGB'); A = np.array(im).astype(np.int16)
 H, W, _ = A.shape
 bg = np.median(np.concatenate([A[:4].reshape(-1, 3), A[-4:].reshape(-1, 3), A[:, :4].reshape(-1, 3), A[:, -4:].reshape(-1, 3)]), axis=0)
-diff = np.abs(A - bg).max(axis=2)
-sat = A.max(axis=2) - A.min(axis=2)
-lum = A.mean(axis=2)
-# background-ness: grey (low saturation) and close to the backdrop brightness
-alpha = np.clip((diff - 10) / 22.0, 0, 1)
-greyish = (sat < 14) & (np.abs(lum - bg.mean()) < 34)
-alpha = np.where(greyish, alpha * 0.35, alpha)
-a_img = Image.fromarray((alpha * 255).astype(np.uint8)).filter(ImageFilter.MedianFilter(3))
-alpha = np.array(a_img) / 255.0
-# un-mix the grey background from semi-transparent edge pixels
-rgb = A.astype(float); a3 = np.maximum(alpha, 1e-3)[..., None]
-rgb = np.clip((rgb - bg * (1 - a3)) / a3, 0, 255)
+GREEN = bg[1] > bg[0] + 60 and bg[1] > bg[2] + 60
+if GREEN:
+    # chroma key: how much greener than red/blue a pixel is decides how much of the backdrop it holds
+    gness = A[..., 1] - np.maximum(A[..., 0], A[..., 2])
+    alpha = 1 - np.clip((gness - 18) / 70.0, 0, 1)
+    a3 = np.maximum(alpha, 0.05)[..., None]
+    rgb = np.clip((A.astype(float) - bg * (1 - a3)) / a3, 0, 255)   # un-mix the green from part-transparent pixels (glows, hair)
+    R_, B_ = rgb[..., 0], rgb[..., 2]
+    # despill: no green fringe, and glows that came out lemon-green over the screen are pulled back to gold
+    rgb[..., 1] = np.minimum(rgb[..., 1], np.maximum(B_, 0.85 * R_ + 0.15 * B_) + 6)
+else:
+    diff = np.abs(A - bg).max(axis=2); sat = A.max(axis=2) - A.min(axis=2); lum = A.mean(axis=2)
+    alpha = np.clip((diff - 12) / 22.0, 0, 1)
+    greyish = (sat < 14) & (np.abs(lum - bg.mean()) < 34)
+    alpha = np.where(greyish, alpha * 0.3, alpha)
+    rgb = A.astype(float); a3 = np.maximum(alpha, 0.05)[..., None]
+    rgb = np.clip((rgb - bg * (1 - a3)) / a3, 0, 255)     # un-mix the grey backdrop from part-transparent edge pixels
+# clean edges: drop faint specks, pull the edge in by a pixel, and darken what is left of the rim so no light halo shows on dark ground
+alpha = np.array(Image.fromarray((alpha * 255).astype(np.uint8)).filter(ImageFilter.MedianFilter(3))) / 255.0
+alpha = np.where(alpha < 0.28, 0, alpha)
+inner = ndi.grey_erosion(alpha, size=(3, 3))
+alpha = np.minimum(alpha, inner * 0.6 + alpha * 0.4)
+rim = (alpha > 0) & (alpha < 0.95)
+rgb = np.where(rim[..., None], rgb * 0.72, rgb)
 rgba = np.dstack([rgb, alpha * 255]).astype(np.uint8)
 
 def runs(v, gap, thr):
@@ -40,8 +60,8 @@ def runs(v, gap, thr):
 M = alpha > 0.16
 rows = runs(M.sum(axis=1), 6, 2)
 rows = [r for r in rows if r[1] - r[0] > 25]
-if len(rows) != 4:
-    print('rows found', len(rows), '-> using equal bands'); rows = [[round(i * H / 4), round((i + 1) * H / 4)] for i in range(4)]
+if len(rows) != NR:
+    print('rows found', len(rows), '-> using equal bands'); rows = [[round(i * H / NR), round((i + 1) * H / NR)] for i in range(NR)]
 frames_src = []   # (row, x0, y0, x1, y1)
 band_cols = []
 for ri_, (y0, y1) in enumerate(rows):
@@ -62,6 +82,7 @@ from collections import Counter
 expect = Counter(len(b[3]) for b in band_cols).most_common(1)[0][0]
 normw = sorted(c[1] - c[0] for b in band_cols if len(b[3]) == expect for c in b[3]); normw = normw[len(normw) // 2]
 for ri_, y0, y1, cols in band_cols:
+    if COUNTS: expect = COUNTS[ri_]
     if len(cols) != expect or max(c[1] - c[0] for c in cols) > 1.6 * normw:
         # frames touch (spell beams, dust trails): the generator spaces frames evenly, so cut at the emptiest
         # column near each equal division of the inked span
@@ -72,7 +93,7 @@ for ri_, y0, y1, cols in band_cols:
             cuts.append(lo + int(np.argmin(proj[lo:hi])))
         cuts.append(last); cols = [[cuts[i], cuts[i + 1]] for i in range(expect)]
     for c in cols: frames_src.append((ri_, c[0], y0, c[1], y1))
-counts = [sum(1 for f in frames_src if f[0] == r) for r in range(4)]
+counts = [sum(1 for f in frames_src if f[0] == r) for r in range(NR)]
 print('frames per row', counts)
 def clean(cell):
     m = cell[..., 3] > 40
@@ -84,8 +105,6 @@ def clean(cell):
         comp = lab == k
         if k == main or (sizes[k - 1] > 25 and (comp & near).any()): keep |= comp
     cell[..., 3] = np.where(keep, cell[..., 3], 0)
-    er = ndi.grey_erosion(cell[..., 3], size=(2, 2))
-    cell[..., 3] = ((cell[..., 3].astype(int) + er.astype(int)) // 2).astype(np.uint8)
     return cell
 tiles = []
 for r, x0, y0, x1, y1 in frames_src:
@@ -98,6 +117,7 @@ for t in tiles:
     bx0, by0, bx1, by1 = t['bb']; m = t['cell'][..., 3] > 40
     band = m[max(by0, by1 - int(0.12 * ih)):by1]; ys, xs = np.where(band)
     t['foot'] = xs.mean() if len(xs) else (bx0 + bx1) / 2; t['base'] = by1
+    if FLY and t['r'] < min(3, NR): t['foot'] = (bx0 + bx1) / 2; t['base'] = by1 + FLY * ih
 # rows 2-3 (attack, death): keep the first frame's foot offset from the body's left edge stable by using each frame's own foot
 packed = []
 for t in tiles:
@@ -113,11 +133,7 @@ for sm, ax, ay in packed:
 b = io.BytesIO(); atlas.save(b, 'WEBP', quality=84, alpha_quality=80, method=6)
 open(f'{out}/cr-{name}.webp', 'wb').write(b.getvalue())
 idx = {}; k = 0
-for r in range(4): idx[r] = list(range(k, k + counts[r])); k += counts[r]
-d = {'scale': round(LH / TH, 5), 'frames': frames, 'anims': {
-    'idle': {'frames': idx[0], 'fps': 6, 'loop': True},
-    'walk': {'frames': idx[1], 'fps': 9, 'loop': True},
-    'attack': {'frames': idx[2], 'fps': 10, 'loop': False},
-    'death': {'frames': idx[3], 'fps': 8, 'loop': False}}, 'label': name}
+for r in range(NR): idx[r] = list(range(k, k + counts[r])); k += counts[r]
+d = {'scale': round(LH / TH, 5), 'frames': frames, 'anims': {nm: {'frames': idx[r], 'fps': fps, 'loop': lp} for r, (nm, fps, lp) in enumerate(ANIMS)}, 'label': name}
 json.dump(d, open(f'{out}/{name}.json', 'w'), separators=(',', ':'))
 print(name, 'scale', round(s, 3), 'atlas', atlas.size, len(b.getvalue()) // 1024, 'KB')

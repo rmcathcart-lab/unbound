@@ -8,7 +8,12 @@ SRC, LAB = sys.argv[1], sys.argv[2]; S = 1.5
 NAMES = {'L1': 'The Hollow Fields', 'L2': 'The Salt Wastes', 'L3': 'The Deep Quarry', 'L4': 'The Hollowdeep Mines', 'L5': "Cogwright's Ruin", 'L6': 'The Sheer Stair', 'L7': 'The Waystone Hills', 'L8': 'The Crossroads'}
 LABEL_AT = {'L1': (1330, 580), 'L2': (1110, 600), 'L3': (950, 400), 'L4': (800, 640), 'L5': (580, 430), 'L6': (480, 620), 'L7': (200, 520), 'L8': (260, 330)}
 im = Image.open(SRC).convert('RGB'); W, H = round(im.width * S), round(im.height * S); im = im.resize((W, H), Image.LANCZOS)
-labels = cv2.resize(cv2.imread(LAB, cv2.IMREAD_GRAYSCALE), (W, H), interpolation=cv2.INTER_NEAREST)
+lab0 = cv2.imread(LAB, cv2.IMREAD_GRAYSCALE)
+try:   # hand patches (tools/map_patches.json): unclaimed painting a land should own, e.g. a peak or a stair landing the segmentation missed
+    for pt in json.load(open('tools/map_patches.json')):
+        k = int(pt['id'][1:]); m = np.zeros_like(lab0); cv2.fillPoly(m, [np.array(pt['poly'], np.int32)], 1); lab0[(m == 1) & (lab0 == 0)] = k
+except FileNotFoundError: pass
+labels = cv2.resize(lab0, (W, H), interpolation=cv2.INTER_NEAREST)
 def save(img, name, q=82):
     b = io.BytesIO(); img.save(b, 'WEBP', quality=q, alpha_quality=85, method=6); open(f'src/art/{name}.webp', 'wb').write(b.getvalue()); return len(b.getvalue()) // 1024
 print('base', save(ImageEnhance.Brightness(im).enhance(0.92), 'wm-base'), 'KB')

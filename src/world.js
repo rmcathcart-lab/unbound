@@ -49,10 +49,52 @@ var LANDS = [
     ],
     boss: { id: 'boss3', name: 'Old Moraine, the Pit Foreman', level: 'BOSS', sigil: 'moraine', gens: ['AN4A_PRG', 'AN4B_PRG', 'AN4A_MAS', 'AN4B_MAS'], title: 'Pitbreaker',
       flavor: 'He ran the quarry for three hundred years and never let a single stone leave without counting it. His gate at the bottom of the pit opens when every creature of the Quarry has fallen at least once. Down there: four questions, and four hundred Lore.' }
+  },
+  { id: 'L4', unit: 4, name: 'The Hollowdeep Mines', subject: 'Factoring', open: true, explore: 2, banner: 'banner-l4',
+    blurb: 'Under the mountain the old miners followed the ore down and down, splitting every vein into the pieces it was made from. Their lanterns still burn in the dark. Find what each seam was multiplied from, and you will find your way through.',
+    outcomes: { AN5A: 'AN5 · Common factors and trinomials x² + bx + c', AN5B: 'AN5 · Special products, ax² + bx + c and solving by factoring' },
+    creatures: [
+      { id: 'glowgrub', name: 'Glowgrub', outcome: 'AN5', group: 'AN5A', level: 'BEG', sigil: 'glowgrub', gen: 'AN5A_BEG', flavor: 'It eats the ore and glows with whatever the ore had in common. Pull the shared part out of every bite and it goes dark.' },
+      { id: 'kobold', name: 'Pickhand Kobold', outcome: 'AN5', group: 'AN5A', level: 'PRG', sigil: 'kobold', gen: 'AN5A_PRG', flavor: 'A small miner with a big pick and a bigger temper. It splits every trinomial into two brackets, and it never mixes up a product with a sum.' },
+      { id: 'troll', name: 'Deepdelver Troll', outcome: 'AN5', group: 'AN5A', level: 'MAS', sigil: 'troll', gen: 'AN5A_MAS', flavor: 'It carries the lantern of the last miner it met. First it takes out what is common; then it breaks what is left in two. In that order, every time.' },
+      { id: 'shardmoth', name: 'Shardmoth', outcome: 'AN5', group: 'AN5B', level: 'BEG', sigil: 'shardmoth', gen: 'AN5B_BEG', flavor: 'Its wings are two perfect squares of crystal with nothing between them. It flutters straight at your lantern.' },
+      { id: 'shambler', name: 'Fungal Shambler', outcome: 'AN5', group: 'AN5B', level: 'PRG', sigil: 'shambler', gen: 'AN5B_PRG', flavor: 'Mushrooms grow on it in pairs: always two caps, always the same two. It splits the middle of anything it eats.' },
+      { id: 'burrower', name: 'Ironjaw Burrower', outcome: 'AN5', group: 'AN5B', level: 'MAS', sigil: 'burrower', gen: 'AN5B_MAS', flavor: 'It chews through rock until it hits zero, then it stops. Every tunnel it digs ends at a solution.' }
+    ],
+    boss: { id: 'boss4', name: 'Dask, the Lantern King', level: 'BOSS', sigil: 'dask', gens: ['AN5A_PRG', 'AN5B_PRG', 'AN5A_MAS', 'AN5B_MAS'], title: 'Deepbreaker',
+      flavor: 'The first miner, crowned by the last. His lantern holds the only light at the bottom of the mountain, and he will not share it. His crystal hall is sealed until every creature of the Mines has fallen at least once. Inside: four questions, and four hundred Lore.' }
+  },
+  { id: 'L5', unit: 5, name: "Cogwright's Ruin", subject: 'Relations and Functions', open: true, explore: 2, banner: 'banner-l5',
+    blurb: 'A city of brass built by one inventor, who made a machine for everything: put something in, and something comes out. The machines still run, though the city has fallen around them. Learn what each one does to its input.',
+    outcomes: { RF2: 'RF1 · RF2 · RF4 · RF5 · Relations: graphs, patterns, intercepts, domain and range', RF8: 'RF1 · RF2 · RF8 · Functions: the function test, function notation and real-world graphs' },
+    creatures: [
+      { id: 'cogmite', name: 'Cogmite', outcome: 'RF2', group: 'RF2', level: 'BEG', sigil: 'cogmite', gen: 'RF2_BEG', flavor: 'A gear on legs. It scuttles across the workshop floor in perfect grid squares, and it always knows which quadrant it is in.' },
+      { id: 'jackal', name: 'Brass Jackal', outcome: 'RF2', group: 'RF2', level: 'PRG', sigil: 'jackal', gen: 'RF2_PRG', flavor: 'It runs its patrol the same way every night, one more lap each time. Tell it where the pattern starts and how much it grows.' },
+      { id: 'pknight', name: 'Piston Knight', outcome: 'RF2', group: 'RF2', level: 'MAS', sigil: 'pknight', gen: 'RF2_MAS', flavor: 'The city guard, built to stand at the edges of things. It knows exactly which end of the line it may step on, and which it may not.' },
+      { id: 'sparkbottle', name: 'Spark Bottle', outcome: 'RF8', group: 'RF8', level: 'BEG', sigil: 'sparkbottle', gen: 'RF8_BEG', flavor: 'Put a number in the bottle and lightning comes out. One input, one bolt. Never two.' },
+      { id: 'mantis', name: 'Clockwork Mantis', outcome: 'RF8', group: 'RF8', level: 'PRG', sigil: 'mantis', gen: 'RF8_PRG', flavor: 'It reads the graph the way it hunts: perfectly still, waiting for the exact input that gives the output it wants.' },
+      { id: 'behemoth', name: 'Steam Behemoth', outcome: 'RF8', group: 'RF8', level: 'MAS', sigil: 'behemoth', gen: 'RF8_MAS', flavor: 'The great engine of the city, still keeping its log of every hour: when it climbed, when it fell, and how fast.' }
+    ],
+    boss: { id: 'boss5', name: 'The Cogwright', level: 'BOSS', sigil: 'cogwright', gens: ['RF2_PRG', 'RF8_PRG', 'RF2_MAS', 'RF8_MAS'], title: 'Gearbreaker',
+      flavor: 'The inventor became his own greatest machine, and forgot what he used to be. His workshop at the heart of the Ruin is locked until every creature of the city has fallen at least once. Inside: four questions, and four hundred Lore.' }
+  },
+  { id: 'L6', unit: 6, name: 'The Sheer Stair', subject: 'Characteristics of Linear Relations', open: true, explore: 2, banner: 'banner-l6',
+    blurb: 'A stairway cut into the face of the mountain, switchback over switchback, so steep the builders measured every flight by its rise and its run. Nobody remembers who rang the bell at the top. Climb up and find out.',
+    outcomes: { RF3D: 'RF3 · The Pythagorean theorem, length, distance and midpoint', RF3S: 'RF3 · Slope: rise over run, parallel and perpendicular' },
+    creatures: [
+      { id: 'ledgeling', name: 'Ledgeling', outcome: 'RF3', group: 'RF3D', level: 'BEG', sigil: 'ledgeling', gen: 'RF3D_BEG', flavor: 'A rock lizard that runs straight across and straight up, never on the slant. It knows the length of every ledge by counting its own steps.' },
+      { id: 'roc', name: 'Cliff Roc', outcome: 'RF3', group: 'RF3D', level: 'PRG', sigil: 'roc', gen: 'RF3D_PRG', flavor: 'It never flies the stairs. It flies straight from landing to landing, the hypotenuse every time, and it is waiting for you halfway.' },
+      { id: 'pilgrim', name: 'Hollow Pilgrim', outcome: 'RF3', group: 'RF3D', level: 'MAS', sigil: 'pilgrim', gen: 'RF3D_MAS', flavor: 'He made it exactly halfway up. Now he stands at the midpoint forever, asking every climber where the other end must be.' },
+      { id: 'snail', name: 'Scree Snail', outcome: 'RF3', group: 'RF3S', level: 'BEG', sigil: 'snail', gen: 'RF3S_BEG', flavor: 'It climbs so slowly you can measure its slope: so far up, so far across. Its silver trail is a perfectly straight line.' },
+      { id: 'stalker', name: 'Rope Stalker', outcome: 'RF3', group: 'RF3S', level: 'PRG', sigil: 'stalker', gen: 'RF3S_PRG', flavor: 'It strings its ropes between three pitons and checks, every time, that all three lie on one line.' },
+      { id: 'yeti', name: 'Avalanche Yeti', outcome: 'RF3', group: 'RF3S', level: 'MAS', sigil: 'yeti', gen: 'RF3S_MAS', flavor: 'It comes down the mountain the fastest way, the steepest slope there is. Its two paths are always parallel, or meet at a right angle.' }
+    ],
+    boss: { id: 'boss6', name: 'Ysolde of the Summit Bell', level: 'BOSS', sigil: 'ysolde', gens: ['RF3D_PRG', 'RF3S_PRG', 'RF3D_MAS', 'RF3S_MAS'], title: 'Stairbreaker',
+      flavor: 'She keeps the bell at the top of the Stair, and rings it once for every climber who makes it. It has not rung in a long time. The summit gate opens when every creature of the Stair has fallen at least once. At the top: four questions, and four hundred Lore.' }
   }
 ];
 /* Lands still to come, shown fogged on the world map until they are built (ids match WM_DEFS regions). */
-var LANDS_SOON = { L4: 'The Hollowdeep Mines', L5: "Cogwright's Ruin", L6: 'The Sheer Stair', L7: 'The Waystone Hills', L8: 'The Crossroads' };
+var LANDS_SOON = { L7: 'The Waystone Hills', L8: 'The Crossroads' };
 /* The tutorial: a small land off the world map where nothing is kept. New heroes start here; the Rules page reopens it. */
 var TUTORIAL = { id: 'T0', unit: 0, name: 'The Proving Grounds', subject: 'How to play', open: true, explore: 2, tutorial: true, banner: 'title',
   blurb: 'A fenced yard behind the first bonfire where new heroes learn the ways of the road. Nothing here is kept, and nothing here can truly kill you.',

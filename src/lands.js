@@ -283,141 +283,150 @@ var LandMaps = (function () {
     };
   };
 
-  /* L4 · Shattered Crypts — THE GRID OF VAULTS.
-   * A true dungeon: chambers on a grid joined by straight corridors, the shape of a Zelda dungeon. The rooms form
-   * a branching tree with a few extra corridors added to make loops. A pillared great hall in the middle is the
-   * landmark you keep passing through. Some chambers have collapsed into rubble and open pits. Leaf rooms (dead
-   * ends) hold the treasure; the farthest one holds the key. The vault door is in the far corner. */
+  /* L4 · The Hollowdeep Mines — THE BRANCHING SEAMS.
+   * Underground, under the mountain. Ore chambers lie at three depths, each one a rough-walled cavern, joined by
+   * winding miners' tunnels. The old rail line is the spine: it zigzags down from the entry shaft at the top-left,
+   * through a chamber on every level, to the Lantern King's crystal hall at the bottom-right, so the way down is
+   * always findable. An underground river crosses the mines halfway down; the rails bridge it once and a plank
+   * crossing a second time (the loop back). Side galleries end in dead ends that pay; the key waits in a flooded
+   * gallery in the far bottom-left. Difficulty rises with depth. */
   BP.L4 = function (k) {
-    var r = k.r, W = k.W, H = k.H, CW = 15, CH = 13, NX = 5, NY = 4, ox = 2, oy = 3, i, x, y;
-    var cells = [];
-    for (y = 0; y < NY; y++) for (x = 0; x < NX; x++) cells.push({ gx: x, gy: y, id: y * NX + x });
-    var hall = function (c) { return (c.gx === 1 || c.gx === 2) && (c.gy === 1 || c.gy === 2); };
-    var bossCell = NX * NY - 1;
-    // the room in each cell
-    cells.forEach(function (c) {
-      if (c.id === bossCell) return;
-      var w = 7 + Math.floor(r() * 5), h = 5 + Math.floor(r() * 4), cx = ox + c.gx * CW + Math.floor(CW / 2), cy = oy + c.gy * CH + Math.floor(CH / 2);
-      if (hall(c)) return;
-      c.rm = { x: cx - Math.floor(w / 2) + Math.floor((r() - 0.5) * 3), y: cy - Math.floor(h / 2) + Math.floor((r() - 0.5) * 3), w: w, h: h };
-      c.cx = c.rm.x + Math.floor(w / 2); c.cy = c.rm.y + Math.floor(h / 2);
-      k.rect(c.rm.x, c.rm.y, w, h, GROUND);
+    var r = k.r, W = k.W, H = k.H, isW = k.isWall, isG = function (v) { return v === GROUND; };
+    k.rect(1, 1, W - 2, H - 2, WALL);
+    var ch = [[10, 8, 6, 4], [30, 8, 7, 4], [52, 9, 7, 4], [72, 10, 6, 4],
+              [16, 24, 7, 4], [38, 23, 7, 5], [62, 25, 7, 4],
+              [11, 41, 6, 4], [31, 42, 7, 4], [52, 43, 6, 4], [70, 40, 5, 4],
+              [24, 54, 6, 3], [44, 55, 6, 3]];
+    ch.forEach(function (c) { k.ell(c[0], c[1], c[2], c[3], GROUND, 0.9); });
+    // miners' tunnels between neighbouring chambers (not every pair: a branching tree plus a few loops)
+    [[0, 1], [1, 2], [2, 3], [0, 4], [1, 5], [3, 6], [4, 5], [5, 6], [4, 7], [5, 8], [6, 9], [9, 10], [7, 8], [7, 11], [8, 11], [9, 12], [11, 12]].forEach(function (e) {
+      var a = ch[e[0]], b = ch[e[1]]; k.road([{ x: a[0], y: a[1] }, { x: b[0], y: b[1] }], 2, GROUND, 2.5, isW);
     });
-    // the great hall: four cells merged, with rows of pillars
-    var hx = ox + CW + 2, hy = oy + CH + 2, hw = 2 * CW - 4, hh = 2 * CH - 4;
-    k.rect(hx, hy, hw, hh, GROUND);
-    for (y = hy + 3; y < hy + hh - 2; y += 4) for (x = hx + 3; x < hx + hw - 2; x += 4) k.rect(x, y, 1, 1, WALL);
-    cells.forEach(function (c) { if (hall(c)) { c.cx = ox + c.gx * CW + Math.floor(CW / 2); c.cy = oy + c.gy * CH + Math.floor(CH / 2); c.hall = true; } });
-    // corridors: a random spanning tree over the grid (the hall counts as one node), plus a few loops
-    var node = function (c) { return c.hall ? 'H' : c.id; };
-    var parent = {}, find = function (a) { while (parent[a] != null && parent[a] !== a) a = parent[a]; return a; };
-    var edges = [];
-    cells.forEach(function (c) { if (c.id === bossCell) return; if (c.gx < NX - 1 && c.id + 1 !== bossCell) edges.push([c, cells[c.id + 1]]); if (c.gy < NY - 1 && c.id + NX !== bossCell) edges.push([c, cells[c.id + NX]]); });
-    edges = edges.filter(function (e) { return node(e[0]) !== node(e[1]); }).sort(function () { return r() - 0.5; });
-    var deg = {}, used = [], spare = [];
-    edges.forEach(function (e) { var a = find(node(e[0])), b = find(node(e[1])); if (a !== b) { parent[a] = b; used.push(e); } else spare.push(e); });
-    used = used.concat(spare.slice(0, 4));
-    function corridor(a, b) { var mx = r() < 0.5; if (mx) { k.seg(a.cx, a.cy, b.cx, a.cy, 2, PATH, k.isWall); k.seg(b.cx, a.cy, b.cx, b.cy, 2, PATH, k.isWall); } else { k.seg(a.cx, a.cy, a.cx, b.cy, 2, PATH, k.isWall); k.seg(a.cx, b.cy, b.cx, b.cy, 2, PATH, k.isWall); } }
-    used.forEach(function (e) { corridor(e[0], e[1]); deg[node(e[0])] = (deg[node(e[0])] || 0) + 1; deg[node(e[1])] = (deg[node(e[1])] || 0) + 1; });
-    // collapsed chambers: rubble and pits
-    [cells[3], cells[10], cells[16]].forEach(function (c) { if (!c.rm) return; k.clumps(c.rm.x, c.rm.y, c.rm.w, c.rm.h, 2, 1.3, WALL); k.disc(c.rm.x + c.rm.w - 2, c.rm.y + 1, 1.3, WATER); });
-    // the vault, entered from the west, through the chamber beside it
-    var bc = cells[bossCell], bx = ox + bc.gx * CW + 3, by = oy + bc.gy * CH + 2;
-    var boss = bossRoom(k, bx, by, 11, 8, 'W', GROUND);
-    var left = cells[bossCell - 1]; k.seg(boss.front.x, boss.front.y, left.cx, boss.front.y, 2, PATH, k.isWall); k.seg(left.cx, boss.front.y, left.cx, left.cy, 2, PATH, k.isWall);
-    // grid distance from the chapel (cell 0) to grade the rooms
-    var adj = {}; used.forEach(function (e) { var a = node(e[0]), b = node(e[1]); (adj[a] = adj[a] || []).push(b); (adj[b] = adj[b] || []).push(a); });
-    var gd = { 0: 0 }, q = [0]; while (q.length) { var n = q.shift(); (adj[n] || []).forEach(function (m) { if (gd[m] == null) { gd[m] = gd[n] + 1; q.push(m); } }); }
-    var rooms = cells.filter(function (c) { return c.id !== 0 && c.id !== bossCell && !c.hall; });
-    var areas = [], leaves = [];
-    rooms.forEach(function (c) { var d = gd[node(c)] || 3; areas.push({ x: c.cx, y: c.cy, rx: Math.floor(c.rm.w / 2) - 1, ry: Math.floor(c.rm.h / 2) - 1, tier: d <= 2 ? 'BEG' : d <= 4 ? 'PRG' : 'MAS', d: d }); if ((deg[node(c)] || 0) <= 1) leaves.push(c); });
-    areas.push({ x: hx + hw / 2, y: hy + hh / 2, rx: hw / 2 - 2, ry: hh / 2 - 2, tier: 'PRG' });
-    // make sure every tier has somewhere to live
-    ['BEG', 'PRG', 'MAS'].forEach(function (tr, ti) { if (!areas.some(function (a) { return a.tier === tr; })) { var srt = areas.slice().sort(function (a, b) { return (a.d || 0) - (b.d || 0); }); srt[ti === 0 ? 0 : srt.length - 1].tier = tr; } });
-    leaves.sort(function (a, b) { return (gd[node(b)] || 0) - (gd[node(a)] || 0); });
-    var keyRoom = leaves[0] || rooms[rooms.length - 1];
+    // crystal pillars inside the chambers (cover, and something to walk around)
+    ch.forEach(function (c, i) { if (i % 2 === 0) k.clumps(c[0] - c[2] + 2, c[1] - c[3] + 1, 2 * c[2] - 4, 2 * c[3] - 2, 1, 1.0, WALL, isG); });
+    // the Lantern King's crystal hall, bottom-right, its gate facing west
+    var boss = bossRoom(k, W - 17, H - 14, 13, 10, 'W');
+    var fire = { x: 7, y: 6 };
+    // the rail line: the spine down through every level
+    k.road([fire, { x: 30, y: 9 }, { x: 52, y: 10 }, { x: 64, y: 16 }, { x: 62, y: 25 }, { x: 38, y: 24 }, { x: 18, y: 26 }, { x: 13, y: 33 }, { x: 11, y: 41 }, { x: 31, y: 43 }, { x: 52, y: 44 }, { x: boss.front.x - 2, y: 47 }, boss.front], 2, PATH, 1.2);
+    // the underground river, meandering across the middle; it only floods rock and cave floor, so the rails bridge it
+    var nzr = k.noise(7);
+    for (var x = 2; x < W - 2; x++) { var yy = 33 + Math.round((nzr(x, 2) - 0.5) * 6); for (var d = 0; d < 3; d++) { var v = k.get(x, yy + d); if (v === WALL || v === GROUND) k.set(x, yy + d, WATER); } }
+    // a plank crossing further east: the loop back up
+    for (var y = 28; y < 40; y++) for (var bb = 0; bb < 2; bb++) { var tv = k.get(58 + bb, y); if (tv === WATER || tv === WALL) k.set(58 + bb, y, PATH); }
+    k.road([{ x: 62, y: 25 }, { x: 58, y: 29 }], 2, PATH, 0); k.road([{ x: 58, y: 39 }, { x: 52, y: 43 }], 2, PATH, 0);
+    // side galleries: short dead-end drifts off the chambers (the dead ends that pay)
     var nooks = [];
-    leaves.slice(1).forEach(function (c) { nooks.push({ x: c.rm.x + 1, y: c.rm.y + 1 }); nooks.push({ x: c.rm.x + c.rm.w - 2, y: c.rm.y + c.rm.h - 2 }); });
-    rooms.forEach(function (c) { nooks.push({ x: c.rm.x + c.rm.w - 2, y: c.rm.y + 1 }); });
-    var c0 = cells[0], fire = { x: c0.cx - 1, y: c0.cy };
-    return { name: 'grid of vaults', spawn: fire, bossRoom: boss, areas: areas, key: { x: keyRoom.cx, y: keyRoom.cy }, nooks: nooks };
+    [[10, 8, -1, 1], [30, 8, 0, -1], [52, 9, 0, -1], [72, 10, 1, -1], [16, 24, -1, -1], [38, 23, 0, 1], [62, 25, 1, 1], [70, 40, 1, -1], [31, 42, 0, 1], [44, 55, 1, 0], [24, 54, -1, 0], [52, 43, 0, -1]].forEach(function (g) {
+      var len = 5 + Math.floor(r() * 4), ex = g[0] + g[2] * (len + 5), ey = g[1] + g[3] * (len + 2);
+      ex = Math.max(3, Math.min(W - 4, ex)); ey = Math.max(3, Math.min(H - 4, ey));
+      k.road([{ x: g[0], y: g[1] }, { x: ex, y: ey }], 2, GROUND, 1.5, function (v) { return v === WALL; });
+      k.disc(ex, ey, 1.5, GROUND, 0.5, function (v) { return v === WALL; }); nooks.push({ x: ex, y: ey });
+    });
+    // the flooded gallery with the key: bottom-left, off the deepest western chamber
+    k.road([{ x: 11, y: 41 }, { x: 6, y: 49 }, { x: 6, y: H - 6 }], 2, GROUND, 1, isW); k.disc(6, H - 6, 2.4, GROUND);
+    k.clumps(3, H - 12, 8, 5, 3, 1.1, WATER, isG);
+    k.disc(fire.x, fire.y, 2.6, GROUND, 0.3);
+    return {
+      name: 'branching seams', spawn: fire, bossRoom: boss,
+      areas: [
+        { x: 30, y: 8, rx: 4, ry: 2, tier: 'BEG' }, { x: 52, y: 9, rx: 4, ry: 2, tier: 'BEG' }, { x: 72, y: 10, rx: 3, ry: 2, tier: 'BEG' }, { x: 16, y: 24, rx: 4, ry: 2, tier: 'BEG' },
+        { x: 38, y: 23, rx: 4, ry: 3, tier: 'PRG' }, { x: 62, y: 25, rx: 4, ry: 2, tier: 'PRG' }, { x: 11, y: 41, rx: 3, ry: 2, tier: 'PRG' }, { x: 70, y: 40, rx: 3, ry: 2, tier: 'PRG' },
+        { x: 31, y: 42, rx: 4, ry: 2, tier: 'MAS' }, { x: 52, y: 43, rx: 3, ry: 2, tier: 'MAS' }, { x: 24, y: 54, rx: 3, ry: 2, tier: 'MAS' }, { x: 44, y: 55, rx: 3, ry: 2, tier: 'MAS' }
+      ],
+      key: { x: 6, y: H - 6 }, nooks: nooks
+    };
   };
 
-  /* L5 · Mirrorfen — THE MIRRORED LAKE.
-   * The whole fen is mirrored left to right across a still black lake. The Mirror Queen holds the island in the
-   * middle, always in view, reached by one causeway from the far (north) shore. You start on the south shore and
-   * must walk all the way round, east or west: the two shores look alike, but what lives on them does not.
-   * Sandbars run out to small islets, which are dead ends with treasure. */
+  /* L5 · Cogwright's Ruin — THE GEAR CITY.
+   * A fallen city laid out on a grid: streets between the ruined blocks of workshops. The grand avenue runs from the
+   * south gate (the bonfire) straight at the Cogwright's workshop in the north, so the boss is in view from the
+   * start, but a toppled clock tower blocks it halfway and you have to find a way round through the side streets.
+   * The central plaza holds a giant broken gear, the landmark you keep passing. A canal runs along one street with
+   * two bridges. Some blocks have collapsed (short cuts); a few have hollow courtyards with a single door (the dead
+   * ends that pay), and the key waits in the walled courtyard in the far north-west. */
   BP.L5 = function (k) {
-    var r = k.r, W = k.W, H = k.H, cx = (W - 1) / 2, cy = 25;
-    k.rect(1, 1, W - 2, H - 2, GROUND);
-    var nz = k.noise(5), x, y;
-    for (y = 1; y < H - 1; y++) for (x = 1; x < W / 2; x++) { var e = Math.min(x, y, H - 1 - y); if (e < 2 + nz(x, y) * 4) k.set(x, y, WALL); }
-    k.ell(cx, cy, 25, 15, WATER, 0.25);
-    // west half detail (mirrored later): reed beds, side ponds, an islet with a sandbar
-    k.clumps(3, 3, cx - 6, H - 6, 10, 1.5, WALL, function (v) { return v === GROUND; });
-    k.disc(8, 12, 3, WATER, 0.7); k.disc(10, 44, 2.5, WATER, 0.7);
-    k.disc(28, 13, 3, GROUND, 0.5); k.road([{ x: 28, y: 13 }, { x: 22, y: 9 }], 2, GROUND, 0);
-    k.disc(26, 37, 3, GROUND, 0.5); k.road([{ x: 26, y: 37 }, { x: 20, y: 43 }], 2, GROUND, 0);
-    // the shore road: from the south bank round the west side to the north bank
-    k.road([{ x: cx, y: 50 }, { x: 22, y: 47 }, { x: 13, y: 36 }, { x: 11, y: 22 }, { x: 18, y: 8 }, { x: cx, y: 5 }], 2, PATH, 2, k.notWater);
-    k.road([{ x: 13, y: 36 }, { x: 4, y: 30 }, { x: 4, y: 20 }, { x: 11, y: 22 }], 2, PATH, 1, k.notWater);
-    // mirror the west half onto the east
-    for (y = 0; y < H; y++) for (x = 0; x < W / 2; x++) k.t[y * W + (W - 1 - x)] = k.t[y * W + x];
-    // the island and the Queen's hall; one causeway from the north shore
-    k.ell(cx, cy, 9, 6, GROUND, 0.3);
-    var boss = bossRoom(k, Math.round(cx) - 6, cy - 3, 12, 6, 'N');
-    k.seg(boss.front.x, boss.front.y, boss.front.x, 5, 2, PATH);
-    var fire = { x: Math.round(cx) - 1, y: 51 };
+    var r = k.r, W = k.W, H = k.H, isW = k.isWall, isG = function (v) { return v === GROUND; };
+    k.rect(1, 1, W - 2, H - 2, WALL);
+    var XS = [5, 19, 33, 43, 53, 67, 80], YS = [5, 17, 29, 41, 53];
+    // streets (width 3), a few segments left buried in rubble so the grid is not a free run
+    var blocked = { 'v,1,1': 1, 'v,5,2': 1, 'h,0,3': 1, 'h,4,1': 1, 'v,2,3': 1, 'h,2,5': 1 };
+    XS.forEach(function (x, i) { for (var j = 0; j < YS.length - 1; j++) if (!blocked['v,' + i + ',' + j]) k.seg(x, YS[j], x, YS[j + 1], 3, GROUND); });
+    YS.forEach(function (y, j) { for (var i = 0; i < XS.length - 1; i++) if (!blocked['h,' + j + ',' + i]) k.seg(XS[i], y, XS[i + 1], y, 3, GROUND); });
+    // the grand avenue: x = 43, from the south gate to the workshop; the fallen clock tower lies across it at y 31-38
+    var fire = { x: 43, y: H - 5 };
+    var boss = bossRoom(k, 36, 3, 15, 9, 'S');
+    k.road([fire, { x: 43, y: 41 }], 4, PATH, 0); k.road([{ x: 43, y: 28 }, boss.front], 4, PATH, 0);
+    k.rect(39, 31, 9, 8, WALL); // the toppled tower
+    // the plaza with the broken gear, just east of the avenue
+    k.disc(60, 35, 7.5, GROUND); k.ring(60, 35, 3, 4.6, WALL);
+    for (var a = 0; a < 360; a += 45) { var gx = Math.round(60 + 5.6 * Math.cos(a * Math.PI / 180)), gy = Math.round(35 + 5.6 * Math.sin(a * Math.PI / 180)); k.set(gx, gy, WALL); }
+    k.disc(60, 35, 1.6, GROUND); k.seg(60, 31, 60, 33, 1, GROUND); // a way into the hub of the gear
+    // the canal along the street at y = 41, west of the avenue, with two bridges
+    for (var x = 2; x < 41; x++) for (var d = -1; d <= 1; d++) if (k.get(x, 41 + d) === GROUND) k.set(x, 41 + d, WATER);
+    [12, 26].forEach(function (bx) { for (var y = 39; y <= 43; y++) for (var q = 0; q < 2; q++) k.set(bx + q, y, PATH); });
+    // collapsed blocks: rubble you can pick your way through (short cuts between streets)
+    [[26, 23], [72, 11], [12, 47], [74, 47], [26, 9]].forEach(function (c) { k.ell(c[0], c[1], 4.5, 3.2, GROUND, 1.0); k.clumps(c[0] - 4, c[1] - 3, 8, 6, 3, 0.9, WALL, isG); });
+    // hollow courtyards with one door (dead ends that pay)
+    var nooks = [];
+    function court(x, y, w, h, door) { k.rect(x, y, w, h, GROUND); var dx = door === 'N' ? x + (w >> 1) : door === 'S' ? x + (w >> 1) : door === 'W' ? x - 1 : x + w, dy = door === 'N' ? y - 1 : door === 'S' ? y + h : y + (h >> 1); k.seg(dx, dy, dx + (door === 'W' ? -2 : door === 'E' ? 2 : 0), dy + (door === 'N' ? -2 : door === 'S' ? 2 : 0), 2, GROUND); nooks.push({ x: x + 1, y: y + 1 }); nooks.push({ x: x + w - 2, y: y + h - 2 }); }
+    court(9, 21, 6, 5, 'S'); court(58, 45, 6, 5, 'N'); court(71, 21, 6, 5, 'W'); court(23, 45, 6, 5, 'E'); court(57, 9, 5, 5, 'S');
+    // the key: a walled courtyard in the far north-west with its only door facing east
+    k.rect(8, 8, 7, 6, GROUND); k.seg(15, 11, 17, 11, 2, GROUND);
+    // steam pools (scalding water) in a few streets for cover and variety
+    k.clumps(4, 4, W - 8, H - 8, 6, 1.4, WATER, isG);
+    k.disc(fire.x, fire.y, 2.6, GROUND, 0.3);
+    nooks = nooks.concat([{ x: 3, y: 57 }, { x: 82, y: 57 }, { x: 82, y: 4 }, { x: 3, y: 30 }, { x: 82, y: 30 }]);
     return {
-      name: 'mirrored lake', spawn: fire, bossRoom: boss,
+      name: 'gear city', spawn: fire, bossRoom: boss,
       areas: [
-        { x: 20, y: 46, rx: 3, tier: 'BEG' }, { x: 12, y: 34, rx: 3, tier: 'BEG' }, { x: 6, y: 25, rx: 2, tier: 'BEG' },
-        { x: W - 21, y: 46, rx: 3, tier: 'PRG' }, { x: W - 13, y: 34, rx: 3, tier: 'PRG' }, { x: W - 12, y: 20, rx: 3, tier: 'PRG' },
-        { x: 18, y: 8, rx: 3, tier: 'MAS' }, { x: W - 19, y: 8, rx: 3, tier: 'MAS' }, { x: cx, y: 6, rx: 3, ry: 1, tier: 'MAS' }
+        { x: 33, y: 53, rx: 3, tier: 'BEG' }, { x: 53, y: 53, rx: 3, tier: 'BEG' }, { x: 19, y: 53, rx: 3, tier: 'BEG' }, { x: 67, y: 53, rx: 3, tier: 'BEG' },
+        { x: 19, y: 29, rx: 3, tier: 'PRG' }, { x: 60, y: 35, rx: 5, tier: 'PRG' }, { x: 80, y: 41, rx: 2, tier: 'PRG' }, { x: 5, y: 41, rx: 2, tier: 'PRG' },
+        { x: 19, y: 5, rx: 3, tier: 'MAS' }, { x: 67, y: 17, rx: 3, tier: 'MAS' }, { x: 33, y: 17, rx: 3, tier: 'MAS' }, { x: 80, y: 5, rx: 2, tier: 'MAS' }
       ],
-      key: { x: W - 29, y: 13 },
-      nooks: [{ x: 28, y: 13 }, { x: 26, y: 37 }, { x: W - 27, y: 37 }, { x: 5, y: 47 }, { x: W - 6, y: 47 }, { x: 4, y: 6 }, { x: W - 5, y: 6 }, { x: 9, y: 16 }, { x: W - 10, y: 16 }, { x: 30, y: 50 }, { x: W - 31, y: 50 }, { x: 4, y: 38 }, { x: W - 5, y: 38 }, { x: 34, y: 4 }]
+      key: { x: 10, y: 10 }, nooks: nooks
     };
   };
 
-  /* L6 · The Drowned Causeway — THE SPINE ACROSS THE SEA.
-   * One long stone causeway runs from the western beach to the sunken fort in the east. It is broken in two
-   * places, where you must drop onto the sandbar that runs beside it and climb back up (a ladder of two parallel
-   * routes joined by rungs). Islets hang off the causeway north and south like the bones of a fish; the further
-   * east, the deadlier. The Gate Key lies on the last islet, at the end of a long sandbar. */
+  /* L6 · The Sheer Stair — THE SWITCHBACKS.
+   * A cliff face climbed by six long ledges, one above the other, joined by stairs that turn back at alternate ends:
+   * every flight is a rise over a run. The bonfire is at the foot of the cliff (bottom-left) and the Summit Bell's
+   * gate is at the very top, seen from below the whole way up. Ledges are narrow where the cliff pinches in and widen
+   * into landings; spurs over the drop are the dead ends that pay. A waterfall spills down the middle of the cliff
+   * (stepping stones on every ledge). An old ladder joins the second ledge to the fourth on the right: the short cut
+   * back down. On the fourth ledge a rope bridge crosses the drop to a pinnacle where the key waits.
+   * Difficulty rises with height: two ledges per tier. */
   BP.L6 = function (k) {
-    var r = k.r, W = k.W, H = k.H;
-    k.rect(1, 1, W - 2, H - 2, WATER);
-    var beach = { x: 9, y: 22 };
-    k.ell(beach.x, beach.y, 7, 11, GROUND, 0.5);
-    k.ell(W - 13, 22, 11, 13, GROUND, 0.4);
-    var spine = k.road([{ x: 8, y: 22 }, { x: 24, y: 18 }, { x: 40, y: 24 }, { x: 56, y: 19 }, { x: 72, y: 25 }, { x: W - 20, y: 21 }], 3, PATH, 2);
-    // breaks in the causeway, and the sandbar that gets you round them
-    k.rect(33, 14, 4, 14, WATER); k.rect(63, 14, 4, 14, WATER);
-    k.road([{ x: 28, y: 22 }, { x: 30, y: 30 }, { x: 40, y: 31 }, { x: 42, y: 26 }], 2, GROUND, 1);
-    k.road([{ x: 58, y: 22 }, { x: 60, y: 30 }, { x: 70, y: 32 }, { x: 72, y: 27 }], 2, GROUND, 1);
-    // fishbone islets
-    var isl = [{ x: 20, y: 7, t: 'BEG' }, { x: 22, y: 35, t: 'BEG' }, { x: 46, y: 8, t: 'PRG' }, { x: 50, y: 36, t: 'PRG' }, { x: 74, y: 9, t: 'MAS' }, { x: 84, y: 38, t: 'MAS' }];
-    var spineAt = function (x) { var best = spine[0]; spine.forEach(function (p) { if (Math.abs(p.x - x) < Math.abs(best.x - x)) best = p; }); return best; };
-    isl.forEach(function (s) { k.ell(s.x, s.y, 5, 4, GROUND, 0.6); var sp = spineAt(s.x); k.road([s, { x: sp.x, y: sp.y }], 2, GROUND, 1.5); k.clumps(s.x - 5, s.y - 4, 10, 8, 2, 1.1, WALL, function (v) { return v === GROUND; }); });
-    k.road([{ x: 84, y: 38 }, { x: 78, y: 41 }], 2, GROUND, 0); k.disc(77, 41, 1.5, GROUND);
-    // rocks and wrecks on the beaches
-    k.clumps(3, 12, 10, 20, 3, 1.2, WALL, function (v) { return v === GROUND; });
-    var boss = bossRoom(k, W - 15, 17, 11, 9, 'W');
-    k.road([{ x: W - 20, y: 21 }, boss.front], 3, PATH, 0);
-    k.frame(W - 18, 13, 16, 17, WALL); k.rect(W - 18, 19, 1, 6, PATH);
-    var fire = { x: beach.x - 2, y: beach.y };
-    return {
-      name: 'causeway spine', spawn: fire, bossRoom: boss,
-      areas: [
-        { x: 20, y: 7, rx: 3, tier: 'BEG' }, { x: 22, y: 35, rx: 3, tier: 'BEG' }, { x: 26, y: 20, rx: 3, ry: 1, tier: 'BEG' },
-        { x: 46, y: 8, rx: 3, tier: 'PRG' }, { x: 50, y: 36, rx: 3, tier: 'PRG' }, { x: 36, y: 31, rx: 3, ry: 1, tier: 'PRG' },
-        { x: 74, y: 9, rx: 3, tier: 'MAS' }, { x: 84, y: 38, rx: 3, tier: 'MAS' }, { x: 66, y: 32, rx: 3, ry: 1, tier: 'MAS' }
-      ],
-      key: { x: 77, y: 41 },
-      nooks: [{ x: 17, y: 5 }, { x: 25, y: 37 }, { x: 43, y: 6 }, { x: 53, y: 38 }, { x: 77, y: 7 }, { x: 4, y: 14 }, { x: 4, y: 30 }, { x: 31, y: 31 }, { x: 69, y: 33 }, { x: W - 8, y: 31 }, { x: W - 8, y: 12 }, { x: 22, y: 9 }, { x: 48, y: 10 }, { x: 47, y: 37 }]
-    };
+    var r = k.r, W = k.W, H = k.H, isW = k.isWall, isG = function (v) { return v === GROUND; };
+    k.rect(1, 1, W - 2, H - 2, WALL);
+    var LY = [H - 7, H - 19, H - 31, H - 43, H - 55, H - 66], X0 = 6, X1 = W - 14, nzl = k.noise(6);
+    // the ledges: rough bands, wider at landings
+    LY.forEach(function (y, i) { for (var x = X0; x <= X1; x++) { var th = 2 + Math.round(nzl(x, i * 9) * 2.4); k.seg(x, y - th, x, y + 1, 1, GROUND); } k.ell(X0 + 3, y - 1, 5, 3.4, GROUND, 0.6); k.ell(X1 - 2, y - 1, 5, 3.4, GROUND, 0.6); });
+    // stairs between ledges, alternating right / left ends (PATH, the cut steps)
+    for (var i = 0; i < LY.length - 1; i++) { var right = i % 2 === 0, sx = right ? X1 - 2 : X0 + 3; k.road([{ x: sx, y: LY[i] - 1 }, { x: sx + (right ? -3 : 3), y: Math.round((LY[i] + LY[i + 1]) / 2) }, { x: sx, y: LY[i + 1] - 1 }], 3, PATH, 0); }
+    // the worn path along each ledge
+    LY.forEach(function (y) { k.road([{ x: X0 + 2, y: y - 1 }, { x: X1 - 2, y: y - 1 }], 1, PATH, 0.6); });
+    // the summit: the bell's gate at the top, reached from the end of the top ledge
+    var boss = bossRoom(k, Math.floor(W / 2) - 8, 2, 15, 7, 'S');
+    k.road([{ x: X0 + 3, y: LY[5] - 1 }, { x: boss.front.x - 6, y: LY[5] - 3 }, boss.front], 3, PATH, 0);
+    // the waterfall down the middle of the cliff: water falls over the rock between ledges, stepping stones on each ledge
+    var wx = Math.floor(W / 2) - 1;
+    for (var y = 10; y < H - 3; y++) for (var q = 0; q < 2; q++) { var v = k.get(wx + q, y); if (v === WALL) k.set(wx + q, y, WATER); else if (v === GROUND && y % 2 === 0) k.set(wx + q, y, WATER); }
+    // the old ladder: ledge 2 to ledge 4 on the right, a short cut back down (1 wide)
+    k.seg(X1 - 7, LY[1] - 2, X1 - 7, LY[3] - 1, 1, PATH);
+    // spurs over the drop (dead ends that pay)
+    var nooks = [];
+    [[14, 0, -1], [30, 1, 1], [46, 1, 1], [20, 2, 1], [40, 2, -1], [12, 3, 1], [44, 3, -1], [26, 4, -1], [48, 4, 1], [20, 5, 1]].forEach(function (s) {
+      var x0 = s[0], y0 = LY[s[1]] + (s[2] > 0 ? 1 : -3), y1 = y0 + s[2] * 4; k.seg(x0, y0, x0 + 2, y1, 2, GROUND, isW); k.disc(x0 + 2, y1, 1.4, GROUND, 0.4, isW); nooks.push({ x: x0 + 2, y: y1 });
+    });
+    // the rope bridge and the pinnacle with the key, east of the fourth ledge
+    var py = LY[3] - 4; k.seg(X1, LY[3] - 1, W - 6, py, 1, PATH); k.disc(W - 5, py, 2.2, GROUND, 0.3);
+    var fire = { x: X0 + 2, y: LY[0] - 1 };
+    k.disc(fire.x, fire.y, 2.4, GROUND, 0.3);
+    function on(i, f) { return { x: Math.round(X0 + 4 + (X1 - X0 - 8) * f), y: LY[i] - 1, rx: 4, ry: 1 }; }
+    var areas = [];
+    [[0, 0.45, 'BEG'], [0, 0.85, 'BEG'], [1, 0.25, 'BEG'], [1, 0.7, 'BEG'], [2, 0.3, 'PRG'], [2, 0.75, 'PRG'], [3, 0.2, 'PRG'], [3, 0.65, 'PRG'], [4, 0.3, 'MAS'], [4, 0.8, 'MAS'], [5, 0.4, 'MAS'], [5, 0.85, 'MAS']].forEach(function (a) { var p = on(a[0], a[1]); p.tier = a[2]; areas.push(p); });
+    return { name: 'switchbacks', spawn: fire, bossRoom: boss, areas: areas, key: { x: W - 5, y: py }, nooks: nooks };
   };
 
   /* L7 · Slopes of Thornhold — THE HOURGLASS.
@@ -661,7 +670,7 @@ var LandMaps = (function () {
       key: { x: 22, y: 30 }, nooks: [{ x: 5, y: 13 }, { x: 13, y: 13 }] };
   };
 
-  var SIZES = { T0: [48, 36], L11: [45, 76], L1: [84, 56], L2: [84, 60], L3: [76, 76], L4: [79, 57], L5: [88, 56], L6: [104, 44], L7: [76, 72], L8: [96, 62], L9: [78, 78], L10: [100, 66] };
+  var SIZES = { T0: [48, 36], L11: [45, 76], L1: [84, 56], L2: [84, 60], L3: [76, 76], L4: [84, 62], L5: [86, 62], L6: [64, 78], L7: [76, 72], L8: [96, 62], L9: [78, 78], L10: [100, 66] };
 
   function build(L, env) {
     var bpf = BP[L.id]; if (!bpf) return null;

@@ -130,6 +130,33 @@ var LOREBOOK = (function () {
   /* exponent-law reference as columns */
   var LAWS = [['Product', '\\(x^a \\cdot x^b = x^{a+b}\\)', '\\(x^3 \\cdot x^5 = x^8\\)'], ['Quotient', '\\(\\dfrac{x^a}{x^b} = x^{a-b}\\)', '\\(\\dfrac{x^7}{x^2} = x^5\\)'], ['Power of a power', '\\((x^a)^b = x^{ab}\\)', '\\((x^3)^4 = x^{12}\\)'], ['Power of a product', '\\((xy)^a = x^a y^a\\)', '\\((2x^2y)^3 = 8x^6y^3\\)'], ['Power of a quotient', '\\(\\left(\\dfrac{x}{y}\\right)^a = \\dfrac{x^a}{y^a}\\)', '\\(\\left(\\dfrac{a}{b}\\right)^2 = \\dfrac{a^2}{b^2}\\)'], ['Zero exponent', '\\(x^0 = 1\\)', '\\((-5x)^0 = 1\\)']];
 
+  /* a small coordinate grid: points [x, y, label], segments [[x1,y1],[x2,y2], dashed?], optional rise/run triangle,
+     an optional vertical test line x = v, and optional open / closed end dots */
+  function plane(o) {
+    o = o || {}; var n = o.n || 6, u = o.u || 18, pad = 22, size = 2 * n * u, s = ARROW;
+    function X(x) { return pad + (x + n) * u; } function Y(y) { return pad + (n - y) * u; }
+    for (var i = -n; i <= n; i++) { s += line(X(i), Y(-n), X(i), Y(n), { color: 'rgba(232,220,192,.12)', w: 1 }) + line(X(-n), Y(i), X(n), Y(i), { color: 'rgba(232,220,192,.12)', w: 1 }); }
+    s += line(X(-n), Y(0), X(n), Y(0), { color: DIM, w: 1.4 }) + line(X(0), Y(-n), X(0), Y(n), { color: DIM, w: 1.4 });
+    s += txt(X(n) - 4, Y(0) - 6, 'x', { size: 13, color: DIM, italic: true }) + txt(X(0) + 9, Y(n) + 12, 'y', { size: 13, color: DIM, italic: true });
+    if (o.quads) [['II', -n / 2, n / 2], ['I', n / 2, n / 2], ['III', -n / 2, -n / 2], ['IV', n / 2, -n / 2]].forEach(function (q) { s += txt(X(q[1]), Y(q[2]) + 6, q[0], { size: 18, color: 'rgba(143,211,255,.45)', bold: true }); });
+    (o.segs || []).forEach(function (g) { s += line(X(g[0][0]), Y(g[0][1]), X(g[1][0]), Y(g[1][1]), { color: g[3] || GOLD, w: 2.4, dash: g[2] }); });
+    if (o.tri) { var a = o.tri[0], b = o.tri[1]; s += line(X(a[0]), Y(a[1]), X(b[0]), Y(a[1]), { color: LORE, w: 1.6, dash: true }) + line(X(b[0]), Y(a[1]), X(b[0]), Y(b[1]), { color: LORE, w: 1.6, dash: true });
+      s += txt((X(a[0]) + X(b[0])) / 2, Y(a[1]) + (b[1] > a[1] ? 16 : -6), 'run ' + (b[0] - a[0]), { size: 12, color: LORE }) + txt(X(b[0]) + 6, (Y(a[1]) + Y(b[1])) / 2 + 4, 'rise ' + (b[1] - a[1]), { size: 12, color: LORE, anchor: 'start' }); }
+    if (o.vline != null) s += line(X(o.vline), Y(-n), X(o.vline), Y(n), { color: LORE, w: 1.6, dash: true });
+    (o.pts || []).forEach(function (q) { s += '<circle cx="' + X(q[0]) + '" cy="' + Y(q[1]) + '" r="4.5" fill="' + (q[3] === 'open' ? INK : (q[4] || GOLD)) + '" stroke="' + (q[4] || GOLD) + '" stroke-width="2"/>'; if (q[2]) s += txt(X(q[0]) + (q[5] || 8), Y(q[1]) - 8, q[2], { size: 12, anchor: 'start' }); });
+    return svg(size + 2 * pad, size + 2 * pad, s, o.label || 'coordinate grid');
+  }
+  /* a story graph: a polyline over time with each piece labelled */
+  function story(pts, labels, xl, yl) {
+    var w = 360, h = 190, x0 = 46, y0 = 16, gw = 290, gh = 140, s = ARROW, mx = pts[pts.length - 1][0], my = 0;
+    pts.forEach(function (p) { if (p[1] > my) my = p[1]; });
+    function X(x) { return x0 + gw * x / mx; } function Y(y) { return y0 + gh - gh * y / (my * 1.15); }
+    s += line(x0, y0 + gh, x0 + gw + 8, y0 + gh, { color: DIM, w: 1.4 }) + line(x0, y0 + gh, x0, y0 - 2, { color: DIM, w: 1.4 });
+    s += txt(x0 + gw / 2, h - 6, xl, { size: 12, color: DIM }) + '<text x="14" y="' + (y0 + gh / 2) + '" ' + F + ' font-size="12" fill="' + DIM + '" text-anchor="middle" transform="rotate(-90 14 ' + (y0 + gh / 2) + ')">' + esc(yl) + '</text>';
+    for (var i = 1; i < pts.length; i++) { s += line(X(pts[i - 1][0]), Y(pts[i - 1][1]), X(pts[i][0]), Y(pts[i][1]), { w: 2.6 }); if (labels[i - 1]) s += txt((X(pts[i - 1][0]) + X(pts[i][0])) / 2, Math.min(Y(pts[i - 1][1]), Y(pts[i][1])) - 8, labels[i - 1], { size: 11, color: LORE }); }
+    return svg(w, h, s, 'story graph');
+  }
+
   return {
   L1: [
     { title: 'The Tally Board', lore: 'Every farm in the Fields kept a tally board by the barn door: a notch for every sack that came in. When the harvests failed the farmers kept notching anyway, for the sacks that should have come. The Tallyhusks still do. Break a number into the primes it is made of and you will see what it is really counting.',
@@ -289,6 +316,156 @@ var LOREBOOK = (function () {
         { h: 'A binomial times a trinomial' },
         { steps: ['(x + 2)(x^{2} - 3x + 4)', '= x^{3} - 3x^{2} + 4x + 2x^{2} - 6x + 8', '= x^{3} - x^{2} - 2x + 8'] },
         { p: 'Two terms by three terms makes six products before you collect. Count them to be sure none got away.' }
+      ] }
+  ],
+  L4: [
+    { title: 'What the Glowgrub Leaves', lore: 'A Glowgrub eats its way along a seam and leaves the rock hollow behind it, but never the part that every stone had in common. That part it keeps, and it glows with it. Miners used to follow the light to find what a whole seam was made of.',
+      math: [
+        { h: 'The greatest common factor (GCF)' },
+        { p: 'The GCF of some terms is the <b>greatest number</b> that divides every coefficient, times the <b>lowest power</b> of each variable that is in every term.' },
+        { cols: [['\\(12x^{2}\\) and \\(18x^{5}\\)', 'GCF of 12 and 18 is 6; lowest power of x is \\(x^{2}\\); GCF \\(= 6x^{2}\\)'], ['\\(8xy^{2}\\) and \\(20x^{3}y\\)', 'GCF \\(= 4xy\\)']] },
+        { h: 'Factoring out the GCF' },
+        { steps: ['6x^{2} - 15x', '= 3x(2x) - 3x(5)', '= 3x(2x - 5)'] },
+        { p: 'Divide each term by the GCF; what is left goes inside the brackets. <b>Check</b> by multiplying the GCF back over the brackets: \\(3x(2x) - 3x(5) = 6x^{2} - 15x\\). ✓' },
+        { p: 'Taking out a <b>negative</b> GCF changes the sign of every term inside: \\(-4x^{2} + 8x = -4x(x - 2)\\).' }
+      ] },
+    { title: 'The Kobold\'s Pair', lore: 'Kobolds split every rock in two with one swing, and they never miss, because they look before they swing. They want two numbers: two that multiply to the last term and add to the middle one. Find the pair, and the rock falls open.',
+      math: [
+        { h: 'Factoring x² + bx + c' },
+        { p: 'Find two integers that <b>multiply to c</b> and <b>add to b</b>. They go straight into the brackets.' },
+        { fig: diamond('12', '7', '3', '4') },
+        { steps: ['x^{2} + 7x + 12', '3 \\times 4 = 12 \\text{ and } 3 + 4 = 7', '= (x + 3)(x + 4)'] },
+        { h: 'Reading the signs' },
+        { cols: [['c positive', 'both numbers have the <b>same</b> sign as b: \\(x^{2} - 9x + 20 = (x - 4)(x - 5)\\)'], ['c negative', 'the numbers have <b>opposite</b> signs; the bigger one takes the sign of b: \\(x^{2} - 2x - 15 = (x - 5)(x + 3)\\)']] },
+        { p: 'Always check by expanding (FOIL). Factoring and multiplying undo each other.' }
+      ] },
+    { title: 'Crystal Wings', lore: 'A Shardmoth\'s wings are two squares of crystal, one large and one small, and nothing grows between them. Miners call any rock that splits that cleanly a twin seam, and they mark it with two lines: one for the sum, one for the difference.',
+      math: [
+        { h: 'Difference of squares' },
+        { rule: 'a^{2} - b^{2} = (a - b)(a + b)' },
+        { fig: diffSquares() },
+        { steps: ['x^{2} - 49 = x^{2} - 7^{2} = (x - 7)(x + 7)', '4x^{2} - 81 = (2x)^{2} - 9^{2} = (2x - 9)(2x + 9)'] },
+        { p: 'Two terms, both perfect squares, with a <b>minus</b> between them. A <b>sum</b> of squares, \\(x^{2} + 49\\), does not factor.' },
+        { h: 'Perfect square trinomials' },
+        { rule: 'a^{2} + 2ab + b^{2} = (a + b)^{2} \\qquad a^{2} - 2ab + b^{2} = (a - b)^{2}' },
+        { p: 'The test: first term a square, last term a <b>positive</b> square, middle term twice their square roots multiplied. \\(x^{2} - 10x + 25\\): \\(x^{2}\\), \\(5^{2}\\), and \\(2(x)(5) = 10x\\). So it is \\((x - 5)^{2}\\).' }
+      ] },
+    { title: 'The Troll\'s Order', lore: 'The Deepdelver Troll does everything in the same order: first it takes what every rock has in common and puts it in its lantern; then it looks at what is left and breaks it apart. The miners it ate did it the other way round.',
+      math: [
+        { h: 'Choosing a strategy' },
+        { cols: [['1. Common factor?', 'Always first. Take out the GCF.'], ['2. Two terms?', 'Difference of squares: \\(a^{2} - b^{2}\\)'], ['3. Three terms?', 'Perfect square? Then x² + bx + c (product and sum). If a ≠ 1, decompose.'], ['4. Check', 'Can any bracket factor again? Expand to check.']] },
+        { steps: ['3x^{3} - 12x = 3x(x^{2} - 4) = 3x(x - 2)(x + 2)', '2x^{2} + 20x + 50 = 2(x^{2} + 10x + 25) = 2(x + 5)^{2}'] },
+        { h: 'When a ≠ 1: decomposition' },
+        { steps: ['2x^{2} + 7x + 3', 'a \\times c = 6;\\ 6 = 1 \\times 6 \\text{ and } 1 + 6 = 7', '= 2x^{2} + x + 6x + 3', '= x(2x + 1) + 3(2x + 1)', '= (2x + 1)(x + 3)'] },
+        { p: 'Split the middle term with the pair, group in twos, and take a common factor from each group. The brackets must match.' }
+      ] },
+    { title: 'Where the Burrower Stops', lore: 'The Ironjaw Burrower digs until it reaches zero, and then it stops dead. Every tunnel it leaves ends in a little chamber where a solution waits. If you want to find them, factor first, and follow each bracket down to zero.',
+      math: [
+        { h: 'The zero product property' },
+        { p: 'If two numbers multiply to make 0, at least one of them is 0. So once an equation is factored and equals 0, each factor can be set to 0.' },
+        { fig: zeroFlow('x² − 3x − 10 = 0', '(x − 5)(x + 2) = 0', ['x − 5 = 0', 'x + 2 = 0'], 'x = 5', 'x = −2') },
+        { h: 'Get it equal to zero first' },
+        { steps: ['x^{2} + 3x = 10', 'x^{2} + 3x - 10 = 0', '(x + 5)(x - 2) = 0', 'x = -5 \\text{ or } x = 2'] },
+        { p: 'Never divide both sides by x: \\(x^{2} = 6x\\) becomes \\(x(x - 6) = 0\\), which has <b>two</b> solutions, \\(x = 0\\) and \\(x = 6\\).' },
+        { p: 'With \\(a \\ne 1\\), one solution may be a fraction: \\((2x - 1)(x + 3) = 0\\) gives \\(x = \\dfrac{1}{2}\\) or \\(x = -3\\).' }
+      ] }
+  ],
+  L5: [
+    { title: 'The Cogmite\'s Grid', lore: 'The Cogwright laid his city on a grid so that every machine had an address: so far across, so far up. The Cogmites still walk the streets in squares, reading the addresses aloud. Across first, then up. They have never once said it the other way.',
+      math: [
+        { h: 'The Cartesian plane' },
+        { fig: plane({ n: 5, quads: true, pts: [[3, 2, 'A(3, 2)'], [-4, 1, 'B(−4, 1)'], [-2, -3, 'C(−2, −3)'], [2, -4, 'D(2, −4)']] }) },
+        { p: 'An ordered pair \\((x, y)\\) means across \\(x\\), then up \\(y\\). The axes split the plane into four <b>quadrants</b>, numbered counter-clockwise from the top right. A point on an axis is in no quadrant.' },
+        { h: 'Two kinds of variable' },
+        { cols: [['Independent', 'the input, chosen or controlled: goes on the horizontal axis'], ['Dependent', 'the output, it depends on the input: goes on the vertical axis']] },
+        { cols: [['Discrete', 'counted; only certain values (gears, people): plot dots'], ['Continuous', 'measured; every value in between (time, height): join with a line']] }
+      ] },
+    { title: 'Patterns on the Bench', lore: 'The apprentices learned by laying out gears in growing patterns, one figure after another, and the Cogwright tested them by pointing at a figure far down the bench that nobody had laid out yet. How many gears in that one?',
+      math: [
+        { h: 'A growing pattern' },
+        { cols: [['Figure', '1 &nbsp; 2 &nbsp; 3 &nbsp; 4'], ['Gears', '5 &nbsp; 8 &nbsp; 11 &nbsp; 14']] },
+        { p: 'It <b>starts</b> at 5 and <b>adds</b> 3 each time. Figure 10 is 9 steps past Figure 1: \\(5 + 3 \\times 9 = 32\\).' },
+        { h: 'As an equation' },
+        { steps: ['\\text{the step is } 3, \\text{ so } G = 3n + b', '\\text{at } n = 1:\\ 3 + b = 5, \\text{ so } b = 2', 'G = 3n + 2'] },
+        { p: 'A pattern that adds the same amount every time is <b>linear</b>: its points lie on a straight line. The amount added is the rate of change.' }
+      ] },
+    { title: 'Where the Walls Are', lore: 'The Piston Knight was built to guard the edges of things, and it knows them all: where a road meets the city wall, where a pipe begins and where it ends, and which ends are open and which are welded shut.',
+      math: [
+        { h: 'Intercepts' },
+        { fig: plane({ n: 5, segs: [[[-5, -5], [2.5, 5]]], pts: [[-1.25, 0, '(−1.25, 0)', 'closed', '#8fd3ff', -64], [0, 1.67, '(0, 1.67)', 'closed', '#8fd3ff']] }) },
+        { cols: [['x-intercept', 'where the graph crosses the x-axis: set \\(y = 0\\)'], ['y-intercept', 'where it crosses the y-axis: set \\(x = 0\\)']] },
+        { p: 'For \\(y = 2x - 6\\): the y-intercept is \\((0, -6)\\); the x-intercept solves \\(0 = 2x - 6\\), so it is \\((3, 0)\\). In a story, an intercept is usually a start (time 0) or an end (nothing left).' },
+        { h: 'Domain and range' },
+        { cols: [['Domain', 'every x-value (input) the relation uses'], ['Range', 'every y-value (output)']] },
+        { p: 'For a set of points, list them: \\(\\{-2, 0, 5\\}\\). For a line segment from \\(x = -3\\) to \\(x = 4\\), write \\(-3 \\le x \\le 4\\). A <b>closed</b> dot is included; an <b>open</b> dot is not.' }
+      ] },
+    { title: 'One Input, One Bolt', lore: 'The Spark Bottles were the Cogwright\'s first true machines. Put a number in, and exactly one bolt of lightning comes out. Never none, never two. A machine that gives two answers to the same question is broken, he said, and threw the broken ones in the canal.',
+      math: [
+        { h: 'Functions' },
+        { p: 'A <b>function</b> is a relation where every input has <b>exactly one</b> output. If any input is paired with two different outputs, it is not a function.' },
+        { fig: plane({ n: 5, segs: [[[-4, -3], [0, 4]], [[0, 4], [4, -3]]], vline: 2 }) },
+        { p: '<b>Vertical line test:</b> if any vertical line crosses the graph more than once, it is not a function. This one passes: every vertical line crosses it once.' },
+        { h: 'Function notation' },
+        { cols: [['\\(f(x) = 2x + 5\\)', 'the same rule as \\(y = 2x + 5\\), named f'], ['\\(f(3)\\)', 'the output when the input is 3: \\(2(3) + 5 = 11\\)'], ['\\(f(x) = 9\\)', 'find the input: \\(2x + 5 = 9\\), so \\(x = 2\\)']] },
+        { p: 'Careful: \\(f(3)\\) is not f times 3. It means "put 3 into f".' }
+      ] },
+    { title: 'The Engine\'s Log', lore: 'The Steam Behemoth kept a log of every hour of the city: when the furnaces were stoked and the pressure climbed, when it held steady, and when it fell. It still writes the log, though nobody reads it. You can read it as a graph.',
+      math: [
+        { h: 'Reading a story graph' },
+        { fig: story([[0, 0], [2, 60], [4, 60], [5, 20], [8, 20]], ['increasing', 'constant', 'decreasing', 'constant'], 'Time (h)', 'Pressure') },
+        { cols: [['Increasing', 'the graph rises left to right'], ['Constant', 'flat: no change'], ['Decreasing', 'falls left to right']] },
+        { h: 'Rate of change' },
+        { rule: '\\text{rate of change} = \\dfrac{\\text{change in output}}{\\text{change in input}}' },
+        { p: 'From hour 0 to hour 2 the pressure rose by 60, so the rate is \\(60 \\div 2 = 30\\) per hour. From hour 4 to hour 5 it fell by 40: a rate of \\(-40\\) per hour. The steeper the piece, the faster the change.' }
+      ] }
+  ],
+  L6: [
+    { title: 'The First Rope', lore: 'The first climbers did not use the stair. They threw a rope from the foot of the cliff to the first ledge, straight across the corner, and climbed it. Every rope on the Stair still makes a right triangle with the rock: so far up, so far across, and the rope across the corner.',
+      math: [
+        { h: 'The Pythagorean theorem' },
+        { rule: 'a^{2} + b^{2} = c^{2}' },
+        { p: 'In a right triangle, \\(c\\) is the <b>hypotenuse</b>: the longest side, across from the right angle. \\(a\\) and \\(b\\) are the legs.' },
+        { steps: ['a = 8,\\ b = 15', 'c^{2} = 8^{2} + 15^{2} = 64 + 225 = 289', 'c = \\sqrt{289} = 17'] },
+        { p: 'Some triangles come out whole: 3-4-5, 5-12-13, 8-15-17. Most do not; round as the question asks. Legs 5 and 9: \\(c = \\sqrt{106} \\approx 10.3\\).' }
+      ] },
+    { title: 'Counting the Steps', lore: 'The Ledgelings never climb on the slant. They run straight along a ledge, or straight up a crack, counting their steps as they go. That is how they know every length on the cliff. For the slanted ones, they borrow the climbers\' rope.',
+      math: [
+        { h: 'Horizontal and vertical lengths' },
+        { p: 'Same y: count across, \\(|x_2 - x_1|\\). Same x: count up, \\(|y_2 - y_1|\\). From \\((-3, 2)\\) to \\((5, 2)\\) is 8 units.' },
+        { h: 'Any segment: a right triangle underneath' },
+        { fig: plane({ n: 5, segs: [[[-3, -2], [3, 3]]], tri: [[-3, -2], [3, 3]], pts: [[-3, -2, 'A'], [3, 3, 'B']] }) },
+        { rule: 'd = \\sqrt{(x_2 - x_1)^{2} + (y_2 - y_1)^{2}}' },
+        { steps: ['A(-3, -2),\\ B(3, 3)', 'd = \\sqrt{(3 - (-3))^{2} + (3 - (-2))^{2}} = \\sqrt{36 + 25} = \\sqrt{61}', 'd \\approx 7.8'] },
+        { p: 'The distance formula is just the Pythagorean theorem, with the run and the rise as the legs.' }
+      ] },
+    { title: 'The Pilgrim\'s Halfway', lore: 'The Hollow Pilgrim made it exactly halfway up the Stair before the cold took him. He still stands there, on the midpoint, and every climber who passes is asked the same question: if I am halfway, where does the stair end?',
+      math: [
+        { h: 'The midpoint' },
+        { rule: 'M = \\left(\\dfrac{x_1 + x_2}{2},\\ \\dfrac{y_1 + y_2}{2}\\right)' },
+        { p: 'Average the x-coordinates; average the y-coordinates.' },
+        { steps: ['A(-2, 7),\\ B(4, -1)', 'M = \\left(\\dfrac{-2 + 4}{2},\\ \\dfrac{7 + (-1)}{2}\\right) = (1, 3)'] },
+        { h: 'A missing endpoint' },
+        { p: 'If you know one end and the midpoint, take the same trip again. From \\(A(1, 2)\\) to \\(M(4, 5)\\) is 3 across and 3 up; 3 across and 3 up again from M gives \\(B(7, 8)\\).' },
+        { fig: plane({ n: 5, segs: [[[-3, -4], [3, 4]]], pts: [[-3, -4, 'A'], [0, 0, 'M (halfway)'], [3, 4, 'B']] }) }
+      ] },
+    { title: 'Rise Over Run', lore: 'The builders of the Stair measured every flight the same way: how high it rises, over how far it runs. A flight that rises 2 for every 3 it runs is gentle enough for a mule. The last flight, below the bell, rises and barely runs at all.',
+      math: [
+        { h: 'Slope' },
+        { rule: 'm = \\dfrac{\\text{rise}}{\\text{run}} = \\dfrac{y_2 - y_1}{x_2 - x_1}' },
+        { steps: ['(1, 2) \\text{ and } (5, 8)', 'm = \\dfrac{8 - 2}{5 - 1} = \\dfrac{6}{4} = \\dfrac{3}{2}'] },
+        { p: 'Subtract in the <b>same order</b> on the top and the bottom, and write the slope in lowest terms.' },
+        { h: 'Four kinds of slope' },
+        { cols: [['Positive', 'rises left to right'], ['Negative', 'falls left to right'], ['Zero', 'horizontal: the rise is 0'], ['Undefined', 'vertical: the run is 0, and you cannot divide by 0']] },
+        { p: 'As a <b>rate</b>, slope has units: a climber who gains 45 m in 3 minutes climbs at \\(15\\) m/min.' }
+      ] },
+    { title: 'Parallel Ropes', lore: 'The Rope Stalker strings its lines across the cliff with care. Three pitons on one rope must lie on one straight line. Two ropes that must never touch run with the same slope. And the rescue rope, the one that crosses them, meets them square.',
+      math: [
+        { h: 'Collinear points' },
+        { p: 'Three points are on one line when the slope from the first to the second equals the slope from the second to the third.' },
+        { h: 'Parallel and perpendicular' },
+        { cols: [['Parallel', 'equal slopes: \\(\\dfrac{2}{3}\\) and \\(\\dfrac{2}{3}\\)'], ['Perpendicular', 'negative reciprocals: \\(\\dfrac{2}{3}\\) and \\(-\\dfrac{3}{2}\\); they multiply to \\(-1\\)'], ['Neither', 'anything else']] },
+        { fig: plane({ n: 5, segs: [[[-4, -3], [2, 1]], [[-2, -5], [4, -1]], [[-3, 4], [1, -2], false, '#8fd3ff']] }) },
+        { p: 'Flip the fraction and change the sign: the perpendicular slope of \\(-4\\) is \\(\\dfrac{1}{4}\\). A horizontal line (slope 0) is perpendicular to a vertical one (undefined).' }
       ] }
   ]
   };

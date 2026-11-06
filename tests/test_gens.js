@@ -1,7 +1,7 @@
 // node tests/test_gens.js [runs]: every generator, every answer graded by the real grader; plus wrong-form checks
 const fs = require('fs'), vm = require('vm'), path = require('path');
 const ctx = { console, Math, module: {}, window: {} }; vm.createContext(ctx);
-for (const f of ['checker.js', 'grader.js', 'questions.js', 'questions_u2.js', 'questions_u3.js'].filter(f => fs.existsSync(path.join(__dirname, '../src', f)))) vm.runInContext(fs.readFileSync(path.join(__dirname, '../src', f), 'utf8').replace(/if \(typeof module[^\n]*/g, ''), ctx);
+for (const f of ['checker.js', 'grader.js', 'figures.js', 'questions.js', 'questions_u2.js', 'questions_u3.js', 'questions_u4.js', 'questions_u5.js', 'questions_u6.js'].filter(f => fs.existsSync(path.join(__dirname, '../src', f)))) vm.runInContext(fs.readFileSync(path.join(__dirname, '../src', f), 'utf8').replace(/if \(typeof module[^\n]*/g, ''), ctx);
 const N = +process.argv[2] || 400; let n = 0, bad = 0;
 const keys = Object.keys(ctx.QGen.GENS).filter(k => !/^TUT/.test(k));
 for (const k of keys) for (let i = 0; i < N; i++) {

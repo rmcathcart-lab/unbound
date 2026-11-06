@@ -171,8 +171,8 @@
   };
 
   /* ---------- painted terrain per land (tools/pack_terrain.py) ---------- */
-  var TSET = { marsh: 'L1', salt: 'L2', quarry: 'L3', mines: 'L4', ruin: 'L3', stair: 'L3', /* L5, L6: borrowed from the quarry until their own sets are painted */ thorn: 'L7', citadel: 'L8', spire: 'L9', frost: 'L10', throne: 'L11' }, terr = {};
-  var TTINT = { ruin: 'rgba(170,120,50,.28)', stair: 'rgba(150,170,200,.26)' }; // a land without its own set can borrow one, recoloured: { theme: 'rgba(...)' }
+  var TSET = { marsh: 'L1', salt: 'L2', quarry: 'L3', mines: 'L4', ruin: 'L5', stair: 'L3', /* L6 borrows the quarry until its own set is painted */ thorn: 'L7', citadel: 'L8', spire: 'L9', frost: 'L10', throne: 'L11' }, terr = {};
+  var TTINT = { stair: 'rgba(150,170,200,.26)' }; // a land without its own set can borrow one, recoloured: { theme: 'rgba(...)' }
   SP.q = 'high'; // image smoothing quality for painted art; the overworld lowers it on slow devices
   SP.terrainReady = function (name) { return !!terrainFor(name); };
   /* a soft round glow, drawn once and reused (radial gradients rebuilt every frame are costly on slow devices) */

@@ -403,7 +403,7 @@
     var c = new Calc(), box = el('div', 'calc hidden'); box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', 'Calculator (TI-30XIIS key layout)');
     box.tabIndex = -1;
     var head = el('div', 'calc-head', '<span class="calc-brand">The Reckoner <em>TI-30XIIS keys</em></span>');
-    var close = el('button', 'calc-close', '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>'); close.setAttribute('aria-label', 'Close calculator'); close.type = 'button'; close.title = 'Close calculator'; head.appendChild(close);
+    var close = el('button', 'calc-close', '<svg viewBox="0 0 16 16" aria-hidden="true" style="pointer-events:none"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>'); close.setAttribute('aria-label', 'Close calculator'); close.type = 'button'; close.title = 'Close calculator'; head.appendChild(close);
     var screen = el('div', 'calc-screen'), ind = el('div', 'calc-ind'), l1 = el('div', 'calc-l1'), l2 = el('div', 'calc-l2');
     screen.appendChild(ind); screen.appendChild(l1); screen.appendChild(l2);
     var pad = el('div', 'calc-pad');
@@ -456,9 +456,10 @@
     }
     function esc(s) { return String(s).replace(/[&<>]/g, function (ch) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch]; }); }
     close.addEventListener('click', function () { api.hide(); });
-    // drag by the head (desktop)
+    // drag by the head (desktop). A press anywhere on the close button, including the lines of its SVG cross, must not
+    // start a drag: the pointer capture would retarget the click to the head and the calculator would not close.
     var drag = null;
-    head.addEventListener('pointerdown', function (e) { if (e.target === close) return; var r = box.getBoundingClientRect(); drag = { dx: e.clientX - r.left, dy: e.clientY - r.top }; head.setPointerCapture(e.pointerId); });
+    head.addEventListener('pointerdown', function (e) { if (close.contains(e.target)) return; var r = box.getBoundingClientRect(); drag = { dx: e.clientX - r.left, dy: e.clientY - r.top }; head.setPointerCapture(e.pointerId); });
     head.addEventListener('pointermove', function (e) { if (!drag) return; var x = Math.max(0, Math.min(innerWidth - box.offsetWidth, e.clientX - drag.dx)), y = Math.max(0, Math.min(innerHeight - 40, e.clientY - drag.dy)); box.style.left = x + 'px'; box.style.top = y + 'px'; box.style.right = 'auto'; box.style.bottom = 'auto'; });
     head.addEventListener('pointerup', function () { drag = null; });
     // physical keyboard while the calculator has focus

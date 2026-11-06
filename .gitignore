@@ -2,3 +2,4 @@ dist/
 shots/
 packs/
 __pycache__/
+.status.md

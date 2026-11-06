@@ -259,6 +259,12 @@
     var ic = window.ART_IMG && ART_IMG['ui-satchel-closed'], io = window.ART_IMG && ART_IMG['ui-satchel-open'];
     var sb = el('button', 'satchel-btn' + (UI.satchel ? ' on' : ''), '<span class="sbl">Satchel</span>' + (ic ? '<span class="sbi"><img class="c" src="' + ic + '" alt=""><img class="o" src="' + io + '" alt=""></span>' : ''));
     sb.type = 'button'; sb.title = 'Satchel (press I)'; sb.setAttribute('aria-label', 'Satchel (press I)'); sb.setAttribute('aria-expanded', UI.satchel ? 'true' : 'false'); sb.onclick = function () { openSatchel(); }; nav.appendChild(sb);
+    if (window.HW && HW.Calc) { // the on-screen calculator (TI-30XIIS keys, src/calc.js): in case a student has no handheld one
+      var cb = el('button', 'calc-btn' + (HW.Calc.get().isOpen() ? ' on' : ''), '<span class="cbl">Calculator</span><span class="cbi">' + HW.CALC_ICON + '</span>');
+      cb.type = 'button'; cb.title = 'Calculator (press C)'; cb.setAttribute('aria-label', 'Calculator (press C)'); cb.setAttribute('aria-pressed', HW.Calc.get().isOpen() ? 'true' : 'false');
+      cb.onclick = function () { HW.Calc.toggle(); }; nav.appendChild(cb);
+      HW.Calc.get().onToggle = function (open) { var b = document.querySelector('.hud .calc-btn'); if (b) { b.classList.toggle('on', open); b.setAttribute('aria-pressed', open ? 'true' : 'false'); } };
+    }
     var mb = el('button', 'mute'); mb.type = 'button';
     function muteFace() { var m = window.Sfx && Sfx.isMuted(), src = window.ART_IMG && ART_IMG[m ? 'ui-sound-off' : 'ui-sound-on']; mb.innerHTML = src ? '<img src="' + src + '" alt="">' : (m ? '🔇' : '🔊'); mb.classList.toggle('off', !!m); mb.title = m ? 'Unmute sound effects' : 'Mute sound effects'; mb.setAttribute('aria-label', mb.title); }
     muteFace(); mb.onclick = function () { var m = Sfx.toggle(); muteFace(); if (!m && UI.screen === 'land') { var rn = Overworld.run(); Sfx.ambient(rn ? rn.map.theme.name : null); } }; nav.appendChild(mb);
@@ -1244,7 +1250,7 @@
         acts.appendChild(el('span', 'spacer'));
         var fl = el('button', 'btn ghost', B.tutorial ? 'Back away' : B.practice ? 'Leave practice' : 'Flee (lose half your Lore)'); fl.type = 'button'; fl.onclick = function () { flee(); }; acts.appendChild(fl);
         qp.appendChild(acts);
-        if (!B.practice && !B.tutorial) qp.appendChild(el('div', 'stay-note', 'Stay in the game until the fight ends: clicking away to another tab, window or app (calculators included) counts as a loss. Use a handheld calculator.'));
+        if (!B.practice && !B.tutorial) qp.appendChild(el('div', 'stay-note', 'Stay in the game until the fight ends: clicking away to another tab, window or app (calculators included) counts as a loss. Use a handheld calculator or the game\'s own Calculator (top bar, or press C).'));
         focusAnswer(mf);
       }
       wrap.appendChild(qp);
@@ -1979,7 +1985,7 @@
       '<li><b>Win streaks pay.</b> Every kill in a row adds 5% (up to +50%). A death resets it.</li>' +
       '<li><b>Answers must be in the form asked for.</b> A right value in the wrong form staggers the creature once; the second time it kills you.</li>' +
       '<li><b>Strike first.</b> Walk up to a creature and attack it (<kbd>E</kbd> or ⚔) before it reaches you, and you get ' + FIRST_STRIKE + ' extra seconds on the clock. If it catches you first, you lose ' + FIRST_STRIKE + ' seconds. Bosses are always challenged, so their clocks never change.</li>' +
-      '<li><b>Stay in the fight.</b> Clicking away to another tab, window or app in the middle of a fight (an on-screen calculator included) loses it, just like a wrong answer. Use a handheld calculator. <b>Fleeing</b> a fight costs half the Lore you carry, and closing or reloading the game in the middle of a fight counts as fleeing. Leave the game while out in a land and you come back exactly where you stood. To get home from deep in a land, crush the <b>Cinder of Return</b> that every Satchel holds (it burns all the Lore you carry), or buy a <b>Homeward Ember</b> from Callum the Merchant (it keeps your Lore).</li>' +
+      '<li><b>Stay in the fight.</b> Clicking away to another tab, window or app in the middle of a fight (a calculator app or website included) loses it, just like a wrong answer. Use a handheld calculator, or the game\'s own <b>Calculator</b> in the top bar (press <kbd>C</kbd>): it has the same keys as the TI-30XIIS and is safe to use mid-fight. <b>Fleeing</b> a fight costs half the Lore you carry, and closing or reloading the game in the middle of a fight counts as fleeing. Leave the game while out in a land and you come back exactly where you stood. To get home from deep in a land, crush the <b>Cinder of Return</b> that every Satchel holds (it burns all the Lore you carry), or buy a <b>Homeward Ember</b> from Callum the Merchant (it keeps your Lore).</li>' +
       '<li><b>Every class has an edge.</b> Squire: a 1 in 10 chance to parry a killing blow. Apprentice: a 1 in 5 chance the hint appears free. Bandit: 50% more time on the clock. Vagabond: the right value counts even in the wrong form. To rename your hero (free) or take up another class (' + n(CLASS_CHANGE_COST) + ' Lore), go to Imbue Lore into Legacy at the bonfire.</li>' +
       '<li><b>The clock.</b> Each question has a time limit (Beginning ' + LEVELS.BEG.time + ' s, Progressing ' + LEVELS.PRG.time + ' s, Mastery and bosses ' + LEVELS.MAS.time + ' s, longer with levels and Patience gear). Out of time counts as a wrong answer.</li>' +
       '<li><b>The lands are labyrinths.</b> Creatures roam them in packs and chase you when they see you — but you are faster. A slain creature leaves a corpse. Die, or rest at the bonfire, and every corpse rises again. The boss door needs the Gate Key and every kind of creature slain once.</li>' +
@@ -2540,6 +2546,7 @@
     if (tag === 'input' || tag === 'textarea' || tag === 'select' || tag === 'math-field' || (t && t.isContentEditable)) return; // typing an answer, not opening the bag
     if (e.key === 'Enter' && !e.repeat && tag !== 'button' && tag !== 'a' && UI.screen === 'battle' && UI.battle && UI.battle.done && UI.battle.resultAt && Date.now() - UI.battle.resultAt > 500 && !UI.satchel && !document.querySelector('.throne-splash')) { // Enter = the return button after a fight
       var go1 = document.querySelector('.battle .result .enter-go'); if (go1) { e.preventDefault(); go1.click(); return; } }
+    if ((e.key === 'c' || e.key === 'C') && window.HW && HW.Calc && UI.screen !== 'ledger' && UI.screen !== 'title') { e.preventDefault(); HW.Calc.toggle(); return; }
     if ((e.key === 'i' || e.key === 'I') && !document.querySelector('.throne-splash') && UI.screen !== 'ledger' && UI.screen !== 'title' && UI.screen !== 'hero') { e.preventDefault(); openSatchel(); }
     else if (e.key === 'Escape' && UI.satchel) { e.preventDefault(); closeSatchel(); }
   });

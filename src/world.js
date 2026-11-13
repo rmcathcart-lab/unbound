@@ -91,10 +91,46 @@ var LANDS = [
     ],
     boss: { id: 'boss6', name: 'Ysolde of the Summit Bell', level: 'BOSS', sigil: 'ysolde', gens: ['RF3D_PRG', 'RF3S_PRG', 'RF3D_MAS', 'RF3S_MAS'], title: 'Stairbreaker',
       flavor: 'She keeps the bell at the top of the Stair, and rings it once for every climber who makes it. It has not rung in a long time. The summit gate opens when every creature of the Stair has fallen at least once. At the top: four questions, and four hundred Lore.' }
+  },
+  { id: 'L7', unit: 7, name: 'The Waystone Hills', subject: 'Equations of Linear Relations', open: true, explore: 2, banner: 'banner-l7',
+    blurb: 'Green hills crossed by old straight roads, and at every bend a standing stone carved with a rule: start here, climb so much for every step across. Follow the carvings and they will take you anywhere. Misread one and they will take you somewhere else.',
+    outcomes: { RF6: 'RF4 · RF5 · RF6 · Lines in every form: y = mx + b, general form, intercepts and graphs', RF7: 'RF3 · RF7 · Writing the equation of a line, and fee-plus-rate models' },
+    creatures: [
+      { id: 'thistlehare', name: 'Thistlehare', outcome: 'RF6', group: 'RF6', level: 'BEG', sigil: 'thistlehare', stand: 'jackal', gen: 'RF6_BEG', flavor: 'It bounds from waystone to waystone in a perfectly straight line, the same rise for every hop across. Read its rule off the stone and you know where it lands next.' },
+      { id: 'gorseboar', name: 'Gorse Boar', outcome: 'RF6', group: 'RF6', level: 'PRG', sigil: 'gorseboar', stand: 'burrower', gen: 'RF6_PRG', flavor: 'It charges along the old roads with every term on one side and nothing left over: zero on the right, and its tusks pointed straight at you.' },
+      { id: 'hillgiant', name: 'Hill Giant', outcome: 'RF6', group: 'RF6', level: 'MAS', sigil: 'hillgiant', stand: 'titan', gen: 'RF6_MAS', flavor: 'It carries a whole waystone as a club, and it can tell at a glance whether two carvings describe the same road. Usually they do not, and usually it is angry about it.' },
+      { id: 'waymarkimp', name: 'Waymark Imp', outcome: 'RF7', group: 'RF7', level: 'BEG', sigil: 'waymarkimp', stand: 'kobold', gen: 'RF7_BEG', flavor: 'It sits on the waymarkers and carves new rules into them: give it a slope and a starting point and it will carve the whole equation, or a wrong one if you are not watching.' },
+      { id: 'stonekite', name: 'Stone Kite', outcome: 'RF7', group: 'RF7', level: 'PRG', sigil: 'stonekite', stand: 'roc', gen: 'RF7_PRG', flavor: 'A hawk of grey granite that hunts by two points: it marks where it sees you, marks where it sees you next, and dives along the line between.' },
+      { id: 'roadwyrm', name: 'Old Road Wyrm', outcome: 'RF7', group: 'RF7', level: 'MAS', sigil: 'roadwyrm', stand: 'serpent', gen: 'RF7_MAS', flavor: 'It is as old as the roads and charges a toll on every one: a fixed fee, then so much for every mile. Work out when its toll beats walking the long way.' }
+    ],
+    boss: { id: 'boss7', name: 'Maren of the Waystones', level: 'BOSS', sigil: 'maren', stand: 'mason', gens: ['RF6_PRG', 'RF7_PRG', 'RF6_MAS', 'RF7_MAS'], title: 'Waybreaker',
+      flavor: 'She carved every waystone in the hills, and she has not forgiven a single traveller who misread one. Her ring of stones on the highest hill stays closed until every creature of the Hills has fallen at least once. Inside: four questions, and four hundred Lore.' }
+  },
+  { id: 'L8', unit: 8, name: 'The Crossroads', subject: 'Systems of Linear Equations', open: true, explore: 2, banner: 'banner-l8',
+    blurb: 'Two great roads cross here at the foot of the last mountains, and everything that travels either road passes through the market where they meet. Find where two lines cross and you find the one point that belongs to both. Past the market, the road climbs to the gate of Lorebound.',
+    outcomes: { RF9A: 'RF9 · Solving systems: graphing, substitution and elimination', RF9B: 'RF9 · Systems in word problems' },
+    creatures: [
+      { id: 'adder', name: 'Forktongue Adder', outcome: 'RF9', group: 'RF9A', level: 'BEG', sigil: 'adder', stand: 'serpent', gen: 'RF9A_BEG', flavor: 'Its tongue forks in two directions, and it only strikes at the one point both tines touch. Find where its two lines cross before it does.' },
+      { id: 'tollogre', name: 'Toll Ogre', outcome: 'RF9', group: 'RF9A', level: 'PRG', sigil: 'tollogre', stand: 'troll', gen: 'RF9A_PRG', flavor: 'It guards the bridge between the two roads and takes one thing off each traveller: one variable, eliminated, and then the other one is easy.' },
+      { id: 'revenant', name: 'Mirrored Revenant', outcome: 'RF9', group: 'RF9A', level: 'MAS', sigil: 'revenant', stand: 'pknight', gen: 'RF9A_MAS', flavor: 'Two knights who walked the same road side by side forever and never met: parallel, no solution. Or the same road exactly: infinitely many. It will ask which.' },
+      { id: 'coinbeetle', name: 'Coin Beetle', outcome: 'RF9', group: 'RF9B', level: 'BEG', sigil: 'coinbeetle', stand: 'scarab', gen: 'RF9B_BEG', flavor: 'It rolls the market\'s dropped coins into a ball and knows exactly how many of each it has: two facts, two unknowns, one answer.' },
+      { id: 'packbeast', name: 'Packbeast', outcome: 'RF9', group: 'RF9B', level: 'PRG', sigil: 'packbeast', stand: 'behemoth', gen: 'RF9B_PRG', flavor: 'It carries two kinds of cargo, and the merchants who load it argue about the totals all day. Write their two equations and settle it.' },
+      { id: 'chimera', name: 'Two-Road Chimera', outcome: 'RF9', group: 'RF9B', level: 'MAS', sigil: 'chimera', stand: 'hydra', gen: 'RF9B_MAS', flavor: 'Two heads, two prices, two plans, and it always asks which is cheaper. The honest answer is: it depends where the lines cross.' }
+    ],
+    boss: { id: 'boss8', name: 'Hesk, Keeper of the Crossroads', level: 'BOSS', sigil: 'hesk', stand: 'cogwright', gens: ['RF9A_PRG', 'RF9B_PRG', 'RF9A_MAS', 'RF9B_MAS'], title: 'Crossbreaker',
+      flavor: 'He has stood where the two roads cross for longer than the market has, and nothing passes onto the mountain road without his leave. His tollhouse is barred until every creature of the Crossroads has fallen at least once. Inside: four questions, and four hundred Lore.' }
+  },
+  { id: 'L9', unit: 9, name: 'The Gate of Lorebound', subject: 'Every outcome, at Mastery', open: true, explore: 2, banner: 'banner-l9', finale: true, region: 'L9',
+    blurb: 'Eight bosses were eight seals on the road, and the last of them is broken. Beyond the Crossroads the old road climbs into the mountains to a great door of light: the gate of Lorebound, at last. Nothing lives on the mountain road. Only the Keeper of the Gate.',
+    outcomes: {},
+    creatures: [],
+    boss: { id: 'boss9', name: 'Seraphel, Keeper of the Gate', level: 'FINAL', sigil: 'seraphel', stand: 'unreckoned', finale: true, gens: [], title: 'Unbound',
+      flavor: 'She has kept the gate of Lorebound since before the roads were laid, and she has turned back every traveller who was not ready. She asks one question from every outcome on the road behind you, every one at Mastery. Answer them all and the gate opens.' }
   }
+
 ];
 /* Lands still to come, shown fogged on the world map until they are built (ids match WM_DEFS regions). */
-var LANDS_SOON = { L7: 'The Waystone Hills', L8: 'The Crossroads' };
+var LANDS_SOON = {};
 /* The tutorial: a small land off the world map where nothing is kept. New heroes start here; the Rules page reopens it. */
 var TUTORIAL = { id: 'T0', unit: 0, name: 'The Proving Grounds', subject: 'How to play', open: true, explore: 2, tutorial: true, banner: 'title',
   blurb: 'A fenced yard behind the first bonfire where new heroes learn the ways of the road. Nothing here is kept, and nothing here can truly kill you.',
@@ -107,7 +143,19 @@ var TUTORIAL = { id: 'T0', unit: 0, name: 'The Proving Grounds', subject: 'How t
     flavor: 'A training golem of stacked practice stones. Two questions in a row, the way every boss asks several.' }
 };
 
-var FINAL_ID = 'L9'; // no final land yet
+var FINAL_ID = 'L9';
+/* The Keeper of the Gate's question pool: for every outcome on the road, the Mastery generators that test it. One is
+ * picked at random per outcome each time the fight starts, so the questions change like any other creature's. */
+(function () {
+  var F = LANDS.filter(function (L) { return L.id === FINAL_ID; })[0], seen = {}, pool = [];
+  LANDS.forEach(function (L) { L.creatures.forEach(function (c) {
+    if (c.level !== 'MAS') return;
+    var key = c.outcome;
+    if (!seen[key]) { seen[key] = { outcome: key, gens: [] }; pool.push(seen[key]); }
+    if (seen[key].gens.indexOf(c.gen) < 0) seen[key].gens.push(c.gen);
+  }); });
+  F.boss.pool = pool; F.boss.gens = pool.map(function (p) { return p.gens[0]; });
+})();
 
 /* Gear: five branches, three tiers. Tier 2 needs tier 1 and level 3; tier 3 needs tier 2, level 6 and a boss kill. */
 var GEAR = [
@@ -181,7 +229,7 @@ var LEVEL = {
   cost: function (lv) { return 60 * lv + 15 * lv * lv; },          // Lore to go from level lv to lv + 1
   lorePct: 3, timePct: 3, speed: 1,
   titles: [[1, 'Wanderer'], [5, 'Delver'], [10, 'Pathfinder'], [15, 'Warden of the Lands'], [20, 'Lorekeeper'], [25, 'Mythic']],
-  crown: 'Lord of Lore',                                           // above every rung: earned by slaying the final boss, at any level
+  crown: 'Unbound',                                           // above every rung: earned by slaying the final boss, at any level
   gate: { 2: 3, 3: 6 }                                             // gear tier -> level required
 };
 

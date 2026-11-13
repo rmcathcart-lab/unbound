@@ -65,7 +65,10 @@
     return '<span class="sig portrait hero-portrait ' + (cls || '') + (frame ? ' frame-' + frame : '') + '" ' + (extra || '') + '>' + inner + '</span>';
   }
   function heroTitle() { var c = heroClass(); return c.stages[heroStage() - 1]; }
-  function portrait(sigil, cls) { // painted portrait when we have one, else the drawn sigil
+  var STAND = null; // sigil -> stand-in sigil, for creatures whose own painting has not arrived yet
+  function standFor(sigil) { if (!STAND) { STAND = {}; LANDS.forEach(function (L) { L.creatures.concat([L.boss]).forEach(function (c) { if (c.stand) STAND[c.sigil || c.id] = c.stand; }); }); } return STAND[sigil]; }
+  function portrait(sigil, cls) { // painted portrait when we have one (or its stand-in's, until it arrives), else the drawn sigil
+    if (window.ART_IMG && !ART_IMG[sigil] && standFor(sigil) && ART_IMG[standFor(sigil)]) sigil = standFor(sigil);
     if (window.ART_IMG && ART_IMG[sigil]) return '<span class="sig portrait ' + (cls || '') + '"><img src="' + ART_IMG[sigil] + '" alt=""></span>';
     return '<span class="sig ' + (cls || '') + '">' + (SIGILS[sigil] || SIGILS.fog) + '</span>';
   }
@@ -98,7 +101,7 @@
   function finaleSealCount() { return LANDS.filter(function (L) { return !L.finale; }).length; }
   function finaleSeals() { return LANDS.filter(function (L) { return !L.finale && S && S.bossKills && S.bossKills[L.id]; }).length; }
   function lockReason(L) {
-    if (L.finale) return 'Sealed by ten seals: the boss of every land. ' + finaleSeals() + ' of ' + finaleSealCount() + ' broken.';
+    if (L.finale) return 'Sealed by the boss of every land on the road: ' + finaleSeals() + ' of ' + finaleSealCount() + ' seals broken.';
     var i = LANDS.indexOf(L), P = LANDS[i - 1];
     return 'Locked · slay ' + esc(P.boss.name) + ' in ' + esc(P.name) + (S && S.klass ? ', or wait for your teacher to open it' : '') + '.';
   }
@@ -445,8 +448,8 @@
       var open = isOpen(L), cleared = open && landCleared(L), kills = L.creatures.filter(function (c) { return S.kills[c.id]; }).length;
       landOf[regionOf(L)] = L.id;
       if (open && !S.seenOpen[L.id]) fresh.push(L.id);
-      if (L.finale) return { id: regionOf(L), name: open ? L.name : 'A land without a name', sub: open ? 'Beyond the lands · ' + L.subject : 'Beyond the lands', locked: !open, cleared: cleared, fresh: open && !S.seenOpen[L.id],
-        status: !open ? lockReason(L) : cleared ? 'You hold the throne ✓' : 'The Hollow Lord waits on the throne' };
+      if (L.finale) return { id: regionOf(L), name: open ? L.name : 'A land without a name', sub: open ? 'The end of the road · ' + L.subject : 'The end of the road', locked: !open, cleared: cleared, fresh: open && !S.seenOpen[L.id],
+        status: !open ? lockReason(L) : cleared ? 'The gate stands open ✓' : esc(L.boss.name) + ' waits at the gate' };
       return { id: regionOf(L), name: L.name, sub: 'Land ' + L.unit + ' · ' + L.subject, locked: !open, cleared: cleared, fresh: open && !S.seenOpen[L.id],
         status: !open ? lockReason(L) : cleared ? 'Boss slain ✓' : kills + ' of ' + L.creatures.length + ' creatures slain' };
     });
@@ -1313,8 +1316,8 @@
     B.done = true; B.phase = 'result'; B.outcome = 'won'; sfx('correct');
     var html = '<h2>' + (B.isBoss ? esc(foe.name) + ' falls' : esc(foe.name) + ' is slain') + '</h2><div class="gain">+' + n(rw.amount) + ' Lore</div><div class="breakdown">' + rw.parts.map(function (p) { return p.k + ' ' + p.m; }).join(' · ') + '</div>' +
       (reclaimed ? '<p><b style="color:var(--lore)">You reclaim ' + n(reclaimed) + ' Lore</b> from where you fell.</p>' : '') +
-      (foe.finale ? '<p>The throne is empty, and then it is not. You are the <b>' + esc(LEVEL.crown) + '</b>.</p>' : B.isBoss ? '<p>The seal breaks. You carry the title <b>' + esc(foe.title) + '</b>.</p>' : '') +
-      (openBefore ? LANDS.filter(function (L) { return isOpen(L) && openBefore.indexOf(L.id) < 0; }).map(function (L) { return '<p class="land-opens">' + (L.finale ? 'The last seal breaks. Far to the west a road opens through the fire: <b>' + esc(L.name) + '</b>.' : 'A new land opens on the world map: <b>' + esc(L.name) + '</b>.') + '</p>'; }).join('') : '') +
+      (foe.finale ? '<p>The Keeper steps aside, and the gate of Lorebound swings open. You are <b>' + esc(LEVEL.crown) + '</b>.</p>' : B.isBoss ? '<p>The seal breaks. You carry the title <b>' + esc(foe.title) + '</b>.</p>' : '') +
+      (openBefore ? LANDS.filter(function (L) { return isOpen(L) && openBefore.indexOf(L.id) < 0; }).map(function (L) { return '<p class="land-opens">' + (L.finale ? 'The last seal breaks. Beyond the Crossroads the mountain road opens: <b>' + esc(L.name) + '</b>.' : 'A new land opens on the world map: <b>' + esc(L.name) + '</b>.') + '</p>'; }).join('') : '') +
       youTyped(B) + solutionBlock(q);
     var res = el('div', 'result win', html);
     res.appendChild(afterActions(true));
@@ -1383,10 +1386,10 @@
     var old = document.querySelector('.throne-splash'); if (old) old.remove();
     var c = heroClass(), art = window.ART_IMG && ART_IMG['throne-' + c.id], hero = S.hero ? S.hero.name : S.name;
     var sp = el('div', 'throne-splash' + (art ? ' painted' : ''));
-    sp.setAttribute('role', 'dialog'); sp.setAttribute('aria-label', 'You have become the Lord of Lore');
+    sp.setAttribute('role', 'dialog'); sp.setAttribute('aria-label', 'The gate of Lorebound is open');
     sp.innerHTML = (art ? '<img class="ts-art" src="' + art + '" alt="">' : '<div class="ts-seat"><div class="ts-crown">' + lordBadge('ts-lord') + '</div>' + (ART_IMG && ART_IMG['hero-' + c.id + '-3'] ? '<img src="' + ART_IMG['hero-' + c.id + '-3'] + '" alt="">' : '') + '</div>') +
-      '<div class="ts-glow"></div><div class="ts-cap"><div class="eyebrow">' + esc(hero) + ' · ' + esc(c.name) + '</div><h1>The lands have been vanquished,<br>you have become the Lord of Lore!</h1></div>';
-    var b = el('button', 'btn big ts-rise', 'Rise, ' + esc(LEVEL.crown)); b.type = 'button'; b.onclick = function () { sp.classList.add('out'); setTimeout(function () { sp.remove(); }, 600); };
+      '<div class="ts-glow"></div><div class="ts-cap"><div class="eyebrow">' + esc(hero) + ' · ' + esc(c.name) + '</div><h1>The road is behind you.<br>The gate of Lorebound is open!</h1></div>';
+    var b = el('button', 'btn big ts-rise', 'Step through the gate'); b.type = 'button'; b.onclick = function () { sp.classList.add('out'); setTimeout(function () { sp.remove(); }, 600); };
     sp.querySelector('.ts-cap').appendChild(b);
     document.body.appendChild(sp); sfx('bonfire');
     setTimeout(function () { try { b.focus(); } catch (e) {} }, 1200);
@@ -1910,7 +1913,7 @@
       tile('Accuracy', won + lost ? Math.round(100 * won / (won + lost)) + '%' : '—', won + lost ? n(won) + ' right of ' + n(won + lost) + ' answers' : 'No fights yet') +
       tile('Best streak', n(S.bestStreak), 'Right now: ' + n(S.streak || 0) + ' in a row') +
       tile('Deaths', n(S.deaths), S.lostForever ? n(S.lostForever) + ' Lore lost forever' : 'No Lore lost forever') +
-      tile('Bosses', bossTotal() + '<span class="ck-of"> / ' + bossN + '</span>', isLordOfLore() ? 'Lord of Lore' : 'Achievements: ' + achN + ' of ' + ACHIEVEMENTS.length)));
+      tile('Bosses', bossTotal() + '<span class="ck-of"> / ' + bossN + '</span>', isLordOfLore() ? esc(LEVEL.crown) : 'Achievements: ' + achN + ' of ' + ACHIEVEMENTS.length)));
 
     // the journey: one line per land
     var jr = el('div', 'panel chron-journey', '<div class="eyebrow">The journey</div>');
@@ -1921,12 +1924,12 @@
       var row = el('div', 'jr-row' + (open ? '' : ' locked') + (boss ? ' done' : ''));
       var dots = ''; for (var i = 0; i < pagesT; i++) dots += '<i class="' + (i < pagesF ? 'on' : '') + '"></i>';
       row.innerHTML = '<span class="jr-ban"' + (ban ? ' style="background-image:url(' + ban + ')"' : '') + '></span>' +
-        '<div class="jr-name"><b>' + esc(open ? L.name : (L.finale ? 'A land without a name' : L.name)) + '</b><span>' + (L.finale ? (open ? 'The final land' : 'Beyond the lands') : 'Land ' + L.unit + ' · ' + esc(L.subject)) + '</span></div>' +
+        '<div class="jr-name"><b>' + esc(open ? L.name : (L.finale ? 'A land without a name' : L.name)) + '</b><span>' + (L.finale ? (open ? 'The final land' : 'The end of the road') : 'Land ' + L.unit + ' · ' + esc(L.subject)) + '</span></div>' +
         (open ? (kinds ? '<div class="jr-meter" title="' + slain + ' of ' + kinds + ' kinds of creature slain at least once"><div class="jr-track"><span style="width:' + Math.round(100 * slain / kinds) + '%"></span></div><span class="jr-lab">' + slain + ' of ' + kinds + ' creatures</span></div>' : '<div class="jr-meter empty"></div>') +
           (pagesT ? '<div class="jr-pages" title="' + pagesF + ' of ' + pagesT + ' Lorebook pages found"><span class="jr-dots">' + dots + '</span><span class="jr-lab">pages</span></div>' : '<div class="jr-pages empty"></div>') +
           (chestsT ? '<div class="jr-chests" title="Chests opened"><b>' + chestsF + '</b><span class="jr-lab">of ' + chestsT + ' chests</span></div>' : '<div class="jr-chests empty"></div>') +
           (L.finale ? '<div class="jr-key empty"></div>' : '<div class="jr-key' + (w.key ? ' on' : '') + '" title="' + (w.key ? 'Gate key found' : 'Gate key not found yet') + '">' + (key ? '<img src="' + key + '" alt="">' : 'key') + '</div>') +
-          '<div class="jr-boss' + (boss ? ' on' : '') + '" title="' + esc(L.boss.name) + (boss ? ': slain' : ': waiting') + '">' + (seal ? '<img src="' + seal + '" alt="">' : '') + '<span class="jr-lab">' + (boss ? (L.finale ? 'Throne taken' : 'Seal broken') : 'Boss waits') + '</span></div>'
+          '<div class="jr-boss' + (boss ? ' on' : '') + '" title="' + esc(L.boss.name) + (boss ? ': slain' : ': waiting') + '">' + (seal ? '<img src="' + seal + '" alt="">' : '') + '<span class="jr-lab">' + (boss ? (L.finale ? 'Gate opened' : 'Seal broken') : 'Boss waits') + '</span></div>'
         : '<div class="jr-lockline">' + (window.ART_IMG && ART_IMG['ui-lock-simple'] ? '<img src="' + ART_IMG['ui-lock-simple'] + '" alt="">' : '') + '<span>' + lockReason(L).replace(/^Locked · /, '').replace(/^./, function (ch) { return ch.toUpperCase(); }) + '</span></div>');
       jr.appendChild(row);
     });
@@ -2443,7 +2446,7 @@
     p.appendChild(el('p', 'muted', 'Land 1 is always open, and a student opens the next land on their own by slaying the boss of the land before it. Open a land here to let ' + (LG.klass ? 'everyone in ' + esc(LG.klass) : 'every class') + ' in early, as the semester reaches that unit. Students see the change within a minute or two. A land a student has already entered stays open for them.'));
     var row = el('div', 'lands-toggle');
     LANDS.forEach(function (L, i) {
-      if (L.finale) return; // opens only when a student has slain all ten bosses
+      if (L.finale) return; // opens only when a student has slain every boss on the road
       var on = i === 0 || mine.indexOf(L.id) >= 0, viaAll = key !== '*' && all.indexOf(L.id) >= 0;
       var b = el('button', 'land-chip' + (on || viaAll ? ' on' : '') + (i === 0 || viaAll ? ' fixed' : ''), '<span class="u">' + L.unit + '</span><span class="nm">' + esc(L.name) + '</span><span class="sj">' + (i === 0 ? 'always open' : viaAll ? 'open for every class' : on ? 'open' : 'locked') + '</span>');
       b.type = 'button'; b.disabled = i === 0 || viaAll; b.setAttribute('aria-pressed', on || viaAll ? 'true' : 'false');

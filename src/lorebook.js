@@ -467,6 +467,97 @@ var LOREBOOK = (function () {
         { fig: plane({ n: 5, segs: [[[-4, -3], [2, 1]], [[-2, -5], [4, -1]], [[-3, 4], [1, -2], false, '#8fd3ff']] }) },
         { p: 'Flip the fraction and change the sign: the perpendicular slope of \\(-4\\) is \\(\\dfrac{1}{4}\\). A horizontal line (slope 0) is perpendicular to a vertical one (undefined).' }
       ] }
+  ]  ,
+  L7: [
+    { title: 'The Carving on the Stone', lore: 'Every waystone in the Hills carries the same kind of carving: a number to start from, and a number to climb for every step across. The Thistlehares read them without thinking. Start at the y-intercept, then rise and run, and you can draw the road before you walk it.',
+      math: [
+        { h: 'Slope y-intercept form' },
+        { rule: 'y = mx + b' },
+        { p: '\\(m\\) is the <b>slope</b> (rise over run) and \\(b\\) is the <b>y-intercept</b>, where the line crosses the y-axis at \\((0, b)\\).' },
+        { cols: [['\\(y = 3x - 2\\)', 'slope 3, y-intercept \\(-2\\)'], ['\\(y = -\\dfrac{1}{2}x + 4\\)', 'slope \\(-\\dfrac{1}{2}\\), y-intercept 4'], ['\\(y = 5 + 2x\\)', 'slope 2, y-intercept 5: the order of the terms does not matter']] },
+        { h: 'Graphing from m and b' },
+        { steps: ['y = \\dfrac{2}{3}x - 1', '\\text{Plot } (0, -1)', '\\text{Run 3 right, rise 2 up: } (3, 1)', '\\text{Join the points with a straight line}'] },
+        { fig: plane({ n: 5, segs: [[[-3, -3], [4.5, 2]]], tri: [[0, -1], [3, 1]], pts: [[0, -1, '(0, -1)'], [3, 1, '(3, 1)']] }) }
+      ] },
+    { title: 'Is the Traveller on the Road?', lore: 'A traveller standing in the gorse is not on the road, however close she looks. The Waymark Imps settle it the honest way: put her x into the road\'s rule and see whether her y comes out.',
+      math: [
+        { h: 'Tables of values' },
+        { p: 'Choose x-values, substitute, and record y. For \\(y = 2x + 1\\):' },
+        { cols: [['x', '\\(-2\\quad -1\\quad 0\\quad 1\\quad 2\\)'], ['y', '\\(-3\\quad -1\\quad 1\\quad 3\\quad 5\\)']] },
+        { p: 'Equal steps in x give equal steps in y: the relation is <b>linear</b>.' },
+        { h: 'Does the point lie on the line?' },
+        { steps: ['(4, 9) \\text{ on } y = 2x + 1?', 'y = 2(4) + 1 = 9', '\\text{Yes: the point is on the line}'] },
+        { p: 'If the y that comes out is different from the point\'s y, the point is not on the line.' }
+      ] },
+    { title: 'Zero on the Right', lore: 'The Gorse Boars carry their rules the old way, every term on one side and nothing left over but zero. It is the same road as y = mx + b; it only looks different. The Hill Giants can tell at a glance when two carvings describe the same road.',
+      math: [
+        { h: 'General form' },
+        { rule: 'Ax + By + C = 0' },
+        { p: '\\(A\\), \\(B\\) and \\(C\\) are integers with no common factor, \\(A\\) is positive, and 0 stands alone on the right.' },
+        { h: 'From y = mx + b to general form' },
+        { steps: ['y = \\dfrac{2}{3}x - 4', '3y = 2x - 12', '0 = 2x - 3y - 12', '2x - 3y - 12 = 0'] },
+        { h: 'From general form to y = mx + b' },
+        { steps: ['4x + 2y - 6 = 0', '2y = -4x + 6', 'y = -2x + 3'] },
+        { p: 'Move the x-term and the constant across (their signs change), then divide <b>every</b> term by the y-coefficient.' }
+      ] },
+    { title: 'Where the Road Meets the Axes', lore: 'Two waystones on every road are special: the one where it crosses the north road and the one where it crosses the east road. Find those two and you can draw any road in the Hills with a ruler.',
+      math: [
+        { h: 'Intercepts' },
+        { cols: [['x-intercept', 'set \\(y = 0\\) and solve for x'], ['y-intercept', 'set \\(x = 0\\) and solve for y']] },
+        { steps: ['3x - 4y - 12 = 0', 'y = 0:\\ 3x = 12,\\ x = 4 \\Rightarrow (4, 0)', 'x = 0:\\ -4y = 12,\\ y = -3 \\Rightarrow (0, -3)'] },
+        { fig: plane({ n: 5, segs: [[[-1.33, -4], [5.5, 1.125]]], pts: [[4, 0, '(4, 0)'], [0, -3, '(0, -3)']] }) },
+        { h: 'Horizontal and vertical lines' },
+        { cols: [['\\(y = k\\)', 'horizontal, slope 0; general form \\(y - k = 0\\)'], ['\\(x = k\\)', 'vertical, slope undefined; general form \\(x - k = 0\\)']] }
+      ] },
+    { title: 'The Toll of the Old Road', lore: 'The Old Road Wyrm charges every traveller a fixed fee to set foot on its road, then so much for every mile. Merchants write its toll as a line, and so should you: the fee is where the line starts, and the rate is how steeply it climbs.',
+      math: [
+        { h: 'Writing the equation of a line' },
+        { cols: [['Slope and y-intercept', 'write \\(y = mx + b\\) straight away'], ['Slope and a point', 'substitute the point into \\(y = mx + b\\) and solve for \\(b\\)'], ['Two points', 'find the slope first, then use either point']] },
+        { steps: ['m = 3,\\ (2, 7)', '7 = 3(2) + b', 'b = 1', 'y = 3x + 1'] },
+        { h: 'Fee plus rate' },
+        { p: 'A toll of $6 plus $4 per mile: \\(C = 4d + 6\\). The rate is the slope; the fee is the starting value.' },
+        { p: 'Two tolls cost the same where their lines cross: \\(4d + 6 = 2d + 14\\) gives \\(d = 4\\) miles.' }
+      ] }
+  ],
+  L8: [
+    { title: 'Where Two Roads Cross', lore: 'The market grew up at the one place that belongs to both great roads. A system of two equations is two roads, and its solution is that one place: the point that lies on both lines at once.',
+      math: [
+        { h: 'Solving by graphing' },
+        { p: 'Graph both lines. The <b>point of intersection</b> is the solution.' },
+        { fig: plane({ n: 5, segs: [[[-4, -3], [4, 5]], [[-4, 4], [4, -4], false, '#8fd3ff']], pts: [[0, 1, '(0, 1)']] }) },
+        { p: '\\(y = x + 1\\) and \\(y = -x + 1\\) cross at \\((0, 1)\\).' },
+        { h: 'Checking a solution' },
+        { p: 'Substitute the point into <b>both</b> equations. It is the solution only if both are true.' }
+      ] },
+    { title: 'Parallel Roads', lore: 'Some roads out of the Crossroads run side by side to the mountains and never meet. Some turn out, on closer inspection, to be the very same road. The Mirrored Revenants walk them forever, asking travellers which is which.',
+      math: [
+        { h: 'How many solutions?' },
+        { cols: [['One solution', 'different slopes: the lines cross once'], ['No solution', 'same slope, different y-intercepts: parallel lines'], ['Infinitely many', 'same slope and same y-intercept: the same line']] },
+        { p: 'Without graphing: write both equations as \\(y = mx + b\\) and compare.' },
+        { steps: ['y = 2x + 3 \\text{ and } 4x - 2y = 2', '4x - 2y = 2 \\Rightarrow y = 2x - 1', '\\text{Same slope, different } b: \\text{ no solution}'] }
+      ] },
+    { title: 'The Ogre\'s Trade', lore: 'The Toll Ogre makes every traveller trade one thing for another of equal worth. That is substitution: if one equation tells you what y is worth in x, trade it into the other equation, and only one unknown is left.',
+      math: [
+        { h: 'Substitution' },
+        { steps: ['y = 2x - 1 \\text{ and } 3x + y = 14', '3x + (2x - 1) = 14', '5x = 15,\\ x = 3', 'y = 2(3) - 1 = 5', '(3, 5)'] },
+        { p: 'Isolate a variable whose coefficient is 1 or \\(-1\\): no dividing, so no fractions.' }
+      ] },
+    { title: 'What Cancels', lore: 'Two merchants arguing at the same stall, one owing what the other is owed: add their accounts together and the debt disappears. Elimination works the same way. Line up the equations so one variable cancels, and add.',
+      math: [
+        { h: 'Elimination' },
+        { steps: ['2x + 3y = 12 \\text{ and } 4x - 3y = 6', '\\text{Add: } 6x = 18,\\ x = 3', '2(3) + 3y = 12,\\ y = 2', '(3, 2)'] },
+        { p: 'Opposite coefficients: <b>add</b>. Equal coefficients: <b>subtract</b>. Neither: multiply one or both equations first.' },
+        { steps: ['x + 2y = 8 \\text{ and } 3x + 5y = 21', '\\times 3:\\ 3x + 6y = 24', '\\text{Subtract: } y = 3,\\ x = 2'] },
+        { p: 'Always do the same thing to both sides of an equation.' }
+      ] },
+    { title: 'The Merchants\' Sums', lore: 'Every argument in the market has two facts in it: how many, and how much. Twelve coins, worth $1.80. Two kinds of sack, one cart, one total weight. Write a fact as an equation, write the other fact as a second equation, and the argument is over.',
+      math: [
+        { h: 'Word problems' },
+        { steps: ['\\text{Let } a = \\text{adult tickets},\\ s = \\text{student tickets}', 'a + s = 50 \\quad\\text{(how many)}', '8a + 5s = 310 \\quad\\text{(how much)}', 's = 50 - a:\\ 8a + 250 - 5a = 310', 'a = 20,\\ s = 30'] },
+        { p: 'Define the variables first. Then one equation for the count and one for the value.' },
+        { h: 'Two plans' },
+        { p: 'Plan A: $20 plus $3 per day. Plan B: $8 plus $5 per day. Equal where \\(3d + 20 = 5d + 8\\): \\(d = 6\\). Fewer than 6 days, B is cheaper; more, A is.' }
+      ] }
   ]
   };
 })();

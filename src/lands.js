@@ -429,225 +429,107 @@ var LandMaps = (function () {
     return { name: 'switchbacks', spawn: fire, bossRoom: boss, areas: areas, key: { x: W - 5, y: py }, nooks: nooks };
   };
 
-  /* L7 · Slopes of Thornhold — THE HOURGLASS.
-   * A wide, open, thorny slope at the bottom (choose your own way between the briars), squeezed through a single
-   * fortified pass in the ridge, then opening again onto the plateau and the ruins of Thornhold, with the keep at
-   * the top. Everyone must go through the pass, which makes it a chokepoint. A hidden goat trail far to the east is
-   * the secret second way up, and the shortcut back down. */
+  /* L7 · The Waystone Hills — STRAIGHT ROADS OVER ROUND HILLS.
+   * Rolling hilltops (round clearings) joined by long, perfectly straight old roads, each at its own slope: the land is
+   * a graph of lines. Open meadows break up the gorse between them, a stream wanders across the whole map and the roads
+   * ford it, and at every crossing stands a waystone. The ring of stones sits on the highest hill in the north-east,
+   * in sight from the middle of the map. The key waits on a lone hill past the Mastery hills in the south-east. */
   BP.L7 = function (k) {
-    var r = k.r, W = k.W, H = k.H, x, y;
-    k.rect(1, 1, W - 2, H - 2, GROUND);
-    var nz = k.noise(5); for (y = 1; y < H - 1; y++) for (x = 1; x < W - 1; x++) { var e = Math.min(x, y, W - 1 - x, H - 1 - y); if (e < 2 + nz(x, y) * 3) k.set(x, y, WALL); }
-    // the ridge
-    var rz = k.noise(6); for (y = 30; y < 46; y++) for (x = 1; x < W - 1; x++) if (y > 33 + rz(x, 0) * 3 && y < 42 + rz(x, 9) * 3) k.set(x, y, WALL);
-    // briar thickets on the slope (cover), fewer on the plateau
-    k.clumps(4, 46, W - 8, H - 52, 22, 1.7, WALL, function (v) { return v === GROUND; });
-    k.clumps(4, 4, W - 8, 26, 6, 1.4, WALL, function (v) { return v === GROUND; });
-    // the pass and its gatehouse
-    var px = 36; k.rect(px, 30, 4, 17, PATH); k.rect(px - 5, 44, 14, 6, GROUND); k.rect(px - 4, 30, 3, 3, WALL); k.rect(px + 5, 30, 3, 3, WALL); k.rect(px - 4, 44, 3, 2, WALL); k.rect(px + 5, 44, 3, 2, WALL);
-    // the goat trail: long and narrow, winding up the far east of the ridge
-    k.road([{ x: 66, y: 52 }, { x: 70, y: 44 }, { x: 64, y: 38 }, { x: 69, y: 31 }, { x: 62, y: 25 }], 2, PATH, 1.5);
-    // ruins on the plateau: broken walls
-    [[8, 14, 14, 10], [44, 12, 12, 9], [24, 20, 10, 7], [52, 24, 12, 6]].forEach(function (b) { k.frame(b[0], b[1], b[2], b[3], WALL); for (var g = 0; g < 3; g++) { var side = Math.floor(r() * 4), gx = b[0] + 2 + Math.floor(r() * (b[2] - 4)), gy = b[1] + 2 + Math.floor(r() * (b[3] - 4)); if (side === 0) k.rect(gx, b[1], 2, 1, GROUND); else if (side === 1) k.rect(gx, b[1] + b[3] - 1, 2, 1, GROUND); else if (side === 2) k.rect(b[0], gy, 1, 2, GROUND); else k.rect(b[0] + b[2] - 1, gy, 1, 2, GROUND); } });
-    // the keep (boss) at the top, and the old road through the ruins
-    var boss = bossRoom(k, 31, 3, 14, 7, 'S');
-    k.road([{ x: 38, y: 30 }, { x: 34, y: 22 }, { x: 40, y: 16 }, boss.front], 2, PATH, 1);
-    k.road([{ x: 38, y: 28 }, { x: 14, y: 26 }, { x: 15, y: 19 }], 2, PATH, 1); k.road([{ x: 40, y: 27 }, { x: 62, y: 25 }, { x: 50, y: 17 }], 2, PATH, 1);
-    // a ruined watchtower in the north-west corner holds the key
-    k.frame(3, 3, 8, 7, WALL); k.rect(3, 6, 1, 2, GROUND); k.road([{ x: 15, y: 17 }, { x: 4, y: 7 }], 2, PATH, 1);
-    // the old road up the slope
-    var fire = { x: 10, y: H - 8 };
-    k.road([fire, { x: 24, y: 62 }, { x: 30, y: 54 }, { x: 37, y: 48 }], 2, PATH, 3);
-    k.road([{ x: 24, y: 62 }, { x: 50, y: 64 }, { x: 66, y: 52 }], 2, PATH, 3);
-    return {
-      name: 'hourglass pass', spawn: fire, bossRoom: boss,
-      areas: [
-        { x: 24, y: 60, rx: 5, tier: 'BEG' }, { x: 46, y: 62, rx: 6, tier: 'BEG' }, { x: 16, y: 52, rx: 5, tier: 'BEG' },
-        { x: 38, y: 47, rx: 4, ry: 2, tier: 'PRG' }, { x: 60, y: 56, rx: 4, tier: 'PRG' }, { x: 15, y: 19, rx: 4, tier: 'PRG' },
-        { x: 50, y: 16, rx: 4, tier: 'MAS' }, { x: 29, y: 23, rx: 3, tier: 'MAS' }, { x: 58, y: 27, rx: 4, ry: 2, tier: 'MAS' }
-      ],
-      key: { x: 6, y: 6 },
-      nooks: [{ x: 10, y: 16 }, { x: 46, y: 14 }, { x: 26, y: 22 }, { x: 54, y: 26 }, { x: 64, y: 8 }, { x: 4, y: 40 }, { x: 70, y: 66 }, { x: 4, y: 58 }, { x: 33, y: 47 }, { x: 43, y: 47 }, { x: 68, y: 38 }, { x: 22, y: 8 }, { x: 56, y: 44 }, { x: 30, y: 68 }]
-    };
-  };
-
-  /* L8 · Twin Citadels — TWO STRONGHOLDS AND A CHASM.
-   * Two walled citadels face each other across a bottomless chasm, joined by a single bridge. You start in the
-   * siege trenches below the western citadel. The Twin Kings' throne room stands on a rock pillar in the chasm,
-   * and its door opens only from the western citadel's battlements, but the key is deep inside the EASTERN
-   * citadel. Every student has to take both strongholds and cross the bridge twice. */
-  BP.L8 = function (k) {
-    var r = k.r, W = k.W, H = k.H, x, y;
-    k.rect(1, 1, W - 2, H - 2, GROUND);
-    var nz = k.noise(5); for (y = 1; y < H - 1; y++) for (x = 1; x < W - 1; x++) { var e = Math.min(x, y, W - 1 - x, H - 1 - y); if (e < 2 + nz(x, y) * 3) k.set(x, y, WALL); }
-    // the chasm
-    var cz = k.noise(4); for (y = 1; y < H - 1; y++) for (x = 40; x < 56; x++) if (x > 43 + cz(0, y) * 3 && x < 51 + cz(5, y) * 3) k.set(x, y, WATER);
-    k.rect(40, 30, 16, 3, PATH); // the bridge
-    // west citadel: curtain wall, corner towers, inner keep; gate in the south wall, battlements stair to the north door
-    var A = { x: 5, y: 3, w: 34, h: 22 };
-    k.frame(A.x, A.y, A.w, A.h, WALL); k.frame(A.x + 1, A.y + 1, A.w - 2, A.h - 2, WALL);
-    [[A.x, A.y], [A.x + A.w - 4, A.y], [A.x, A.y + A.h - 4], [A.x + A.w - 4, A.y + A.h - 4]].forEach(function (p) { k.rect(p[0], p[1], 4, 4, WALL); });
-    k.rect(A.x + 15, A.y + A.h - 2, 3, 2, PATH);              // south gate
-    k.frame(A.x + 10, A.y + 6, 13, 9, WALL); k.rect(A.x + 15, A.y + 14, 3, 1, PATH); k.rect(A.x + 22, A.y + 9, 1, 3, PATH); // inner keep
-    k.frame(A.x + 25, A.y + 5, 6, 6, WALL); k.rect(A.x + 25, A.y + 7, 1, 2, PATH);  // armoury
-    // east citadel: lower and longer, a barracks maze inside
-    var B = { x: 58, y: 34, w: 34, h: 24 };
-    k.frame(B.x, B.y, B.w, B.h, WALL); k.frame(B.x + 1, B.y + 1, B.w - 2, B.h - 2, WALL);
-    [[B.x, B.y], [B.x + B.w - 4, B.y], [B.x, B.y + B.h - 4], [B.x + B.w - 4, B.y + B.h - 4]].forEach(function (p) { k.rect(p[0], p[1], 4, 4, WALL); });
-    k.rect(B.x + 6, B.y, 3, 2, PATH);                          // north gate, facing the bridge landing
-    for (var i = 0; i < 4; i++) { var bx = B.x + 5 + i * 7; k.rect(bx, B.y + 5, 1, 14, WALL); k.rect(bx, B.y + (i % 2 ? 6 : 15), 1, 3, GROUND); }  // barracks rows
-    k.rect(B.x + 4, B.y + 12, 26, 1, WALL); k.rect(B.x + 9 + Math.floor(r() * 3), B.y + 12, 2, 1, GROUND); k.rect(B.x + 23, B.y + 12, 2, 1, GROUND);
-    // siege trenches in the south-west field: zig-zag earthworks
-    for (var j = 0; j < 4; j++) { var ty = 32 + j * 6; k.road([{ x: 4, y: ty }, { x: 14, y: ty + 2 }, { x: 24, y: ty }, { x: 34, y: ty + 2 }], 1, WALL, 0); k.rect(8 + (j % 2) * 18, ty - 1, 3, 4, GROUND); }
-    k.clumps(4, 30, 34, 28, 5, 1.2, WATER, function (v) { return v === GROUND; });  // flooded shell craters
-    // ruined siege camp north-east: tents
-    for (i = 0; i < 7; i++) k.rect(60 + Math.floor(r() * 26), 6 + Math.floor(r() * 18), 3, 2, WALL);
-    // the throne room on its pillar; its door is on the west citadel's north-east battlement
-    k.rect(40, 3, 16, 12, GROUND);
-    var boss = bossRoom(k, 42, 4, 12, 8, 'W');
-    k.frame(40, 2, 17, 13, WATER); k.rect(55, 2, 2, 13, WATER);
-    k.road([{ x: boss.gate.x - 1, y: boss.gate.y }, { x: A.x + A.w - 6, y: 8 }], 2, PATH, 0); k.rect(A.x + A.w - 2, 7, 2, 3, PATH);
-    var fire = { x: 8, y: 54 };
-    k.road([fire, { x: 20, y: 44 }, { x: A.x + 16, y: A.y + A.h + 1 }], 2, PATH, 2);
-    k.road([{ x: 22, y: 31 }, { x: 40, y: 31 }], 2, PATH, 0); k.road([{ x: 56, y: 31 }, { x: B.x + 7, y: B.y - 1 }], 2, PATH, 1); k.road([{ x: 56, y: 31 }, { x: 72, y: 20 }], 2, PATH, 2);
-    return {
-      name: 'twin citadels', spawn: fire, bossRoom: boss,
-      areas: [
-        { x: 12, y: 46, rx: 4, tier: 'BEG' }, { x: 28, y: 40, rx: 4, tier: 'BEG' }, { x: 30, y: 52, rx: 4, tier: 'BEG' },
-        { x: A.x + 6, y: A.y + 17, rx: 3, tier: 'PRG' }, { x: A.x + 16, y: A.y + 10, rx: 3, tier: 'PRG' }, { x: 70, y: 16, rx: 6, tier: 'PRG' },
-        { x: B.x + 8, y: B.y + 8, rx: 3, tier: 'MAS' }, { x: B.x + 22, y: B.y + 18, rx: 3, tier: 'MAS' }, { x: B.x + 27, y: B.y + 7, rx: 2, tier: 'MAS' }
-      ],
-      key: { x: B.x + 29, y: B.y + 19 },
-      nooks: [{ x: A.x + 4, y: A.y + 4 }, { x: A.x + 28, y: A.y + 7 }, { x: A.x + 4, y: A.y + 18 }, { x: B.x + 4, y: B.y + 4 }, { x: B.x + 10, y: B.y + 18 }, { x: B.x + 17, y: B.y + 6 }, { x: 88, y: 6 }, { x: 62, y: 26 }, { x: 4, y: 30 }, { x: 36, y: 57 }, { x: 4, y: 4 }, { x: A.x + 13, y: A.y + 9 }, { x: B.x + 30, y: B.y + 4 }, { x: 86, y: 28 }]
-    };
-  };
-
-  /* L9 · Sundered Spire — THE RINGS OF THE TOWER.
-   * A round tower seen from above: an outer ring, a middle ring and the observatory at the core. The ways
-   * between the rings are staggered, so you walk round each ring to find the next way in, spiralling inward
-   * (a classic Metroid/Zelda tower trick). Then the tower has been split by lightning: a bottomless crack runs
-   * through every ring, and only some of the crossings still have bridges. */
-  BP.L9 = function (k) {
-    var r = k.r, W = k.W, H = k.H, cx = 39, cy = 39, i;
-    var P = function (rad, deg) { var a = deg * Math.PI / 180; return { x: Math.round(cx + Math.cos(a) * rad), y: Math.round(cy + Math.sin(a) * rad) }; };
-    k.ring(cx, cy, 30.5, 34, GROUND);             // outer ring
-    k.ring(cx, cy, 17.5, 20.5, GROUND);           // middle ring
-    // chambers between the rings (outer band) and inside the middle ring (inner band)
-    var outerCh = [20, 70, 160, 200, 250, 340], innerCh = [0, 120, 230];
-    var ch = [];
-    outerCh.forEach(function (d) { var p = P(25.5, d); k.disc(p.x, p.y, 3.2, GROUND, 0.3); ch.push({ p: p, d: d, band: 'outer' }); var o = P(30, d); k.seg(p.x, p.y, o.x, o.y, 2, PATH); });
-    innerCh.forEach(function (d) { var p = P(13, d); k.disc(p.x, p.y, 3, GROUND, 0.3); ch.push({ p: p, d: d, band: 'inner' }); var o = P(17.5, d); k.seg(p.x, p.y, o.x, o.y, 2, PATH); });
-    // spokes: outer -> middle only at the north and the east-south-east; middle -> core only at the south
-    [[270, 30.5, 20.5], [20, 30.5, 20.5]].forEach(function (s) { var a = P(s[1], s[0]), b = P(s[2], s[0]); k.seg(a.x, a.y, b.x, b.y, 2, PATH); });
-    // two outer chambers also reach in to the middle ring: extra loops
-    [160, 340].forEach(function (d) { var a = P(25.5, d), b = P(20.5, d); k.seg(a.x, a.y, b.x, b.y, 2, PATH); });
-    // the entrance hall and the bonfire, below the tower
-    k.rect(cx - 4, cy + 33, 9, 5, GROUND); var fire = { x: cx - 2, y: cy + 35 };
-    // the core: the observatory, entered from the south
-    var boss = bossRoom(k, cx - 5, cy - 5, 11, 9, 'S');
-    k.seg(boss.front.x, boss.front.y, cx, cy + 17.5, 2, PATH);
-    // the lightning crack, north-east to south-west; bridges only at some crossings
-    var crack = k.road([{ x: 66, y: 4 }, { x: 52, y: 22 }, { x: 46, y: 30 }, { x: 30, y: 46 }, { x: 22, y: 60 }, { x: 10, y: 74 }], 3, WATER, 2);
-    sealBoss(k, boss);
-    // re-lay bridges where the crack cuts the rings: outer ring north-east (bridge), middle ring north-east (broken), outer ring south-west (bridge), middle ring south-west (bridge)
-    function bridgeNear(rad, deg) { for (var dd = -12; dd <= 12; dd += 1) { var p = P(rad, deg + dd); if (k.get(p.x, p.y) === WATER) { k.ring(cx, cy, rad - 1.5, rad + 1.5, PATH); return; } } }
-    // simpler: put explicit bridges by re-carving short arcs of the ring over the crack
-    function arc(rad, d0, d1, w) { for (var d = d0; d <= d1; d += 1) { var p = P(rad, d); k.rect(p.x - 1, p.y - 1, w, w, PATH); } }
-    arc(32.2, 290, 320, 3); arc(32.2, 110, 140, 3); arc(19, 110, 140, 3);
-    // the key: in the inner chamber that sits beyond the broken middle-ring crossing
-    var keyCh = ch.filter(function (c) { return c.band === 'inner' && c.d === 0; })[0];
-    var nooks = ch.filter(function (c) { return c !== keyCh; }).map(function (c) { return { x: c.p.x, y: c.p.y }; });
-    [45, 135, 225, 315, 290, 100].forEach(function (d) { var p = P(32.5, d); nooks.push(p); });
-    [90, 200, 300].forEach(function (d) { nooks.push(P(19, d)); });
-    return {
-      name: 'rings of the tower', spawn: fire, bossRoom: boss,
-      areas: [
-        { x: P(32, 90).x, y: P(32, 90).y - 1, rx: 4, ry: 1, tier: 'BEG' }, { x: P(25.5, 160).x, y: P(25.5, 160).y, rx: 2, tier: 'BEG' }, { x: P(32, 180).x, y: P(32, 180).y, rx: 1, ry: 4, tier: 'BEG' },
-        { x: P(25.5, 250).x, y: P(25.5, 250).y, rx: 2, tier: 'PRG' }, { x: P(32, 270).x, y: P(32, 270).y, rx: 4, ry: 1, tier: 'PRG' }, { x: P(25.5, 340).x, y: P(25.5, 340).y, rx: 2, tier: 'PRG' },
-        { x: P(19, 270).x, y: P(19, 270).y, rx: 4, ry: 1, tier: 'MAS' }, { x: P(13, 120).x, y: P(13, 120).y, rx: 2, tier: 'MAS' }, { x: P(13, 230).x, y: P(13, 230).y, rx: 2, tier: 'MAS' }
-      ],
-      key: keyCh.p, nooks: nooks
-    };
-  };
-
-  /* L10 · The Frozen Reach — THE FROZEN LAKE AND THE CANYON.
-   * A vast open snowfield wrapped round a great frozen lake (a ring road with the lake as the hole in the middle),
-   * with one narrow ice bridge straight across it: the bold shortcut. Long sightlines on the snow mean creatures
-   * spot you early. North of it all, a cliff wall; the only way to the Winter Wyrm is a long, narrow, winding
-   * canyon with ice caves off its sides: wide-open space first, then a tight finale. */
-  BP.L10 = function (k) {
-    var r = k.r, W = k.W, H = k.H, x, y;
-    k.rect(1, 1, W - 2, H - 2, GROUND);
-    var nz = k.noise(5); for (y = 1; y < H - 1; y++) for (x = 1; x < W - 1; x++) { var e = Math.min(x, y, W - 1 - x, H - 1 - y); if (e < 2 + nz(x, y) * 4) k.set(x, y, WALL); }
-    // the cliff wall across the north
-    var cz = k.noise(7); for (y = 1; y < 22; y++) for (x = 1; x < W - 1; x++) if (y < 14 + cz(x, 0) * 6) k.set(x, y, WALL);
-    // the frozen lake and its ice bridge
-    k.ell(42, 40, 22, 12, WATER, 0.35);
-    k.disc(36, 39, 2.5, GROUND, 0.4);
-    k.road([{ x: 42, y: 54 }, { x: 37, y: 40 }, { x: 44, y: 26 }], 2, PATH, 1);
-    // ice crags and cairn fields on the snow
-    k.clumps(4, 22, W - 8, H - 26, 16, 1.6, WALL, function (v) { return v === GROUND; });
-    k.scatter(70, 24, 24, 16, WALL, 0.05, function (v) { return v === GROUND; });
-    // the ring road round the lake
-    k.road([{ x: 86, y: 57 }, { x: 60, y: 58 }, { x: 22, y: 56 }, { x: 10, y: 42 }, { x: 16, y: 26 }, { x: 44, y: 24 }, { x: 70, y: 28 }, { x: 80, y: 44 }, { x: 86, y: 57 }], 2, PATH, 2, k.notWater);
-    // the canyon: from the north shore up into the cliffs, long and winding, ice caves off its sides
-    var can = k.road([{ x: 30, y: 23 }, { x: 28, y: 15 }, { x: 38, y: 9 }, { x: 52, y: 13 }, { x: 62, y: 6 }, { x: 74, y: 10 }, { x: 80, y: 6 }], 2, GROUND, 1.5);
-    var caves = [[34, 11, 0, -1], [52, 13, 0, 1], [62, 6, -1, 0], [44, 10, 0, -1]];
-    var nooks = [];
-    caves.forEach(function (c) { var ex = c[0] + c[2] * 5, ey = c[1] + c[3] * 4; k.seg(c[0], c[1], ex, ey, 2, GROUND); k.disc(ex, ey, 1.8, GROUND); nooks.push({ x: ex, y: ey }); });
-    var boss = bossRoom(k, 85, 2, 11, 9, 'W');
-    k.road([{ x: 80, y: 6 }, boss.front], 2, GROUND, 0);
-    var fire = { x: 86, y: 57 };
-    k.disc(fire.x, fire.y, 3, GROUND);
-    return {
-      name: 'frozen lake and canyon', spawn: fire, bossRoom: boss,
-      areas: [
-        { x: 70, y: 56, rx: 4, tier: 'BEG' }, { x: 52, y: 58, rx: 4, tier: 'BEG' }, { x: 80, y: 42, rx: 4, tier: 'BEG' },
-        { x: 26, y: 55, rx: 4, tier: 'PRG' }, { x: 12, y: 40, rx: 3, tier: 'PRG' }, { x: 66, y: 28, rx: 4, tier: 'PRG' },
-        { x: 18, y: 26, rx: 3, tier: 'MAS' }, { x: 38, y: 10, rx: 2, tier: 'MAS' }, { x: 70, y: 9, rx: 2, tier: 'MAS' }, { x: 36, y: 39, rx: 1, tier: 'MAS' }
-      ],
-      key: { x: 4, y: 26 },
-      nooks: nooks.concat([{ x: 36, y: 39 }, { x: 94, y: 26 }, { x: 94, y: 44 }, { x: 4, y: 58 }, { x: 46, y: 62 }, { x: 60, y: 22 }, { x: 22, y: 34 }, { x: 74, y: 46 }, { x: 8, y: 50 }, { x: 54, y: 30 }])
-    };
-  };
-
-  /* L11 · The Purloined Throne — THE ROAD THROUGH THE FIRE (the finale).
-   * No creatures, no key, no treasure: a bonfire on a ledge, then one road climbing north across a sea of lava,
-   * lined both sides with standing pillars like an avenue of statues. Two round landings break the climb, and the
-   * throne room's gate is in sight from the very first step. Short, straight and grand: the walk is the ceremony. */
-  BP.L11 = function (k) {
-    // a processional, mirror-symmetric about x = cx: bonfire terrace, road, landing, road, landing, road, gate
-    var W = k.W, H = k.H, cx = (W - 1) / 2, x, y, braziers = [], props = [];
+    var W = k.W, H = k.H, isW = k.isWall, nz = k.noise(7), x, y;
     k.rect(1, 1, W - 2, H - 2, WALL);
-    k.rect(3, 15, W - 6, 58, WATER);                                     // the lava sea, square to the road
+    // open meadows where the noise is high (gorse elsewhere)
+    for (y = 3; y < H - 3; y++) for (x = 3; x < W - 3; x++) if (nz(x, y) > 0.64) k.set(x, y, GROUND);
+    var N = { A: [8, 56], B: [24, 49], C: [42, 55], D: [12, 35], E: [32, 34], F: [52, 42], G: [66, 54], H: [22, 17], I: [44, 21], J: [64, 30], K: [74, 60] };
+    var RAD = { A: 5, B: 6.5, C: 6.5, D: 6.5, E: 7.5, F: 6.5, G: 6, H: 6.5, I: 7.5, J: 6.5, K: 3.5 };
+    Object.keys(N).forEach(function (n) { k.disc(N[n][0], N[n][1], RAD[n], GROUND, 0.5); });
+    // the stream, west to east, wandering
+    k.road([{ x: 2, y: 44 }, { x: 20, y: 42 }, { x: 38, y: 46 }, { x: 56, y: 36 }, { x: 78, y: 40 }], 2, WATER, 4);
+    // the old roads: straight, three wide, fording the stream
+    [['A', 'B'], ['B', 'C'], ['A', 'D'], ['B', 'E'], ['D', 'E'], ['C', 'F'], ['F', 'G'], ['E', 'F'], ['D', 'H'], ['E', 'I'], ['H', 'I'], ['I', 'J'], ['F', 'J'], ['G', 'K']].forEach(function (e) {
+      var p = N[e[0]], q = N[e[1]]; k.seg(p[0], p[1], q[0], q[1], e[1] === 'K' ? 2 : 3, PATH);
+    });
+    // the ring of stones on the highest hill
+    var boss = bossRoom(k, 58, 3, 15, 10, 'S');
+    k.seg(N.J[0], N.J[1], boss.front.x, boss.front.y, 3, PATH);
+    k.disc(boss.front.x, boss.front.y + 1, 2.5, GROUND, 0.3);
+    // hollows off the hills: little dead ends that pay
+    var nooks = [];
+    [[2, 26, 'D', -1, 0], [6, 10, 'H', 0, -1], [34, 8, 'I', 0, -1], [40, 62, 'C', 0, 1], [26, 60, 'B', 0, 1], [54, 52, 'F', 0, 1], [76, 22, 'J', 1, 0], [48, 30, 'E', 1, -1], [14, 48, 'B', -1, 0], [58, 60, 'G', 0, 1]].forEach(function (s) {
+      var c = N[s[2]]; k.seg(c[0], c[1], s[0], s[1], 2, GROUND, isW); k.disc(s[0], s[1], 1.6, GROUND, 0.4); nooks.push({ x: s[0], y: s[1] });
+    });
+    function at(n, tier, rx) { return { x: N[n][0], y: N[n][1], rx: rx || 4, ry: rx || 4, tier: tier }; }
+    var areas = [at('B', 'BEG'), at('C', 'BEG'), at('D', 'BEG'), at('E', 'PRG', 5), at('F', 'PRG'), at('H', 'PRG'), at('I', 'MAS', 5), at('J', 'MAS'), at('G', 'MAS')];
+    return { name: 'the waystone roads', spawn: { x: N.A[0], y: N.A[1] }, bossRoom: boss, areas: areas, key: { x: N.K[0], y: N.K[1] }, nooks: nooks };
+  };
+
+  /* L8 · The Crossroads — TWO LINES AND A MARKET.
+   * A walled market town laid out on a street grid, cut by two great roads that run corner to corner at different
+   * slopes and cross in the market square in the middle of the map. The bonfire is in the west where both roads
+   * enter; the tollhouse stands on the north edge at the foot of the mountain road, reached by a lane from the square.
+   * Beginning creatures in the western streets, Progressing around the square, Mastery in the east and the north.
+   * The key is in a walled yard at the far east end, between where the two roads leave the map. */
+  BP.L8 = function (k) {
+    var W = k.W, H = k.H, r = k.r, x, y, isW = k.isWall;
+    k.rect(1, 1, W - 2, H - 2, WALL);
+    // the street grid: lanes every 8 tiles each way, a few segments missing (blocks merge), two wide
+    var XS = [], YS = []; for (x = 6; x < W - 4; x += 8) XS.push(x); for (y = 6; y < H - 4; y += 8) YS.push(y);
+    YS.forEach(function (yy) { for (var i = 0; i < XS.length - 1; i++) if (r() > 0.22) k.rect(XS[i], yy, XS[i + 1] - XS[i] + 2, 2, GROUND); });
+    XS.forEach(function (xx) { for (var j = 0; j < YS.length - 1; j++) if (r() > 0.22) k.rect(xx, YS[j], 2, YS[j + 1] - YS[j] + 2, GROUND); });
+    // a few courtyards (open blocks)
+    for (var c = 0; c < 7; c++) { var bx = XS[1 + Math.floor(r() * (XS.length - 3))], by = YS[Math.floor(r() * (YS.length - 1))]; k.rect(bx + 2, by + 2, 6, 6, GROUND); }
+    // the two great roads, corner to corner, crossing at the market
+    var M = { x: 48, y: 33 };
+    k.seg(4, 54, 92, 12, 4, PATH); k.seg(4, 12, 92, 54, 4, PATH);
+    // the market square, with stalls (2x2 blocks) in rows
+    k.ell(M.x, M.y, 11, 7, GROUND, 0.2);
+    [[-7, -4], [-3, -4], [3, -4], [7, -4], [-7, 3], [-3, 3], [3, 3], [7, 3]].forEach(function (o) { if (Math.abs(o[0]) > 2) k.rect(M.x + o[0], M.y + o[1], 2, 1, WALL); });
+    k.seg(4, 54, 92, 12, 2, PATH); k.seg(4, 12, 92, 54, 2, PATH);          // the roads stay clear through the square
+    // the bonfire at the west, between the two roads' starts
+    var fire = { x: 7, y: 33 }; k.disc(fire.x, fire.y, 3, GROUND, 0.3); k.seg(fire.x, fire.y, 6, 14, 2, PATH); k.seg(fire.x, fire.y, 6, 52, 2, PATH);
+    // the tollhouse on the north edge, the lane up from the square
+    var boss = bossRoom(k, M.x - 7, 2, 15, 8, 'S');
+    k.seg(M.x, M.y - 6, boss.front.x, boss.front.y, 3, PATH);
+    // the east yard with the key, walled, one gap
+    k.rect(W - 9, 28, 6, 10, GROUND); k.seg(W - 9, 33, W - 14, 33, 2, GROUND);
+    // the river along the south edge, under a bridge on each road
+    k.road([{ x: 2, y: H - 5 }, { x: 30, y: H - 4 }, { x: 60, y: H - 6 }, { x: W - 2, y: H - 4 }], 2, WATER, 2, isW);
+    var nooks = [];
+    [[3, 4], [14, 3], [30, 3], [66, 3], [84, 3], [92, 7], [3, 60], [20, 59], [44, 59], [70, 59], [88, 60], [92, 40]].forEach(function (p) {
+      var bx = Math.max(2, Math.min(W - 3, p[0])), by = Math.max(2, Math.min(H - 3, p[1])); k.disc(bx, by, 1.5, GROUND, 0.3); nooks.push({ x: bx, y: by });
+    });
+    function A(px, py, tier, rx) { return { x: px, y: py, rx: rx || 5, ry: 4, tier: tier }; }
+    var areas = [A(16, 20, 'BEG'), A(18, 44, 'BEG'), A(26, 32, 'BEG'), A(38, 22, 'PRG'), A(40, 44, 'PRG'), A(M.x, M.y, 'PRG', 8), A(58, 22, 'PRG'),
+      A(66, 44, 'MAS'), A(74, 22, 'MAS'), A(80, 46, 'MAS'), A(64, 14, 'MAS')];
+    return { name: 'the market streets', spawn: fire, bossRoom: boss, areas: areas, key: { x: W - 6, y: 33 }, nooks: nooks };
+  };
+
+  /* L9 · The Gate of Lorebound — THE MOUNTAIN ROAD (the finale).
+   * No creatures, no key, no treasure: a bonfire on a ledge, then one road climbing north between the peaks over a sea
+   * of cloud far below, lined both sides with braziers. Two round landings break the climb, and the great door of
+   * Lorebound is in sight from the very first step. Short, straight and grand: the walk is the ceremony. */
+  BP.L9 = function (k) {
+    var W = k.W, H = k.H, cx = (W - 1) / 2, y, braziers = [];
+    k.rect(1, 1, W - 2, H - 2, WALL);
+    k.rect(3, 15, W - 6, 58, WATER);                                     // the drop: cloud and cold air on either side of the road
     function road(y0, y1) { k.rect(cx - 2, y0, 5, y1 - y0 + 1, PATH); for (y = y0; y <= y1; y++) { k.set(cx - 3, y, WALL); k.set(cx + 3, y, WALL); } }
-    function platform(yc, half, hgt) { // a walled square landing with the road running through it
+    function landing(yc, half, hgt) {
       var x0 = cx - half, x1 = cx + half, y0 = yc - hgt, y1 = yc + hgt;
       k.rect(x0, y0, x1 - x0 + 1, y1 - y0 + 1, GROUND); k.frame(x0 - 1, y0 - 1, x1 - x0 + 3, y1 - y0 + 3, WALL);
-      k.rect(cx - 2, y0 - 1, 5, y1 - y0 + 3, PATH);                       // openings top and bottom, the road through the middle
+      k.rect(cx - 2, y0 - 1, 5, y1 - y0 + 3, PATH);
       return { x0: x0 - 1, x1: x1 + 1, y0: y0 - 1, y1: y1 + 1 };
     }
     var fire = { x: cx, y: 68 };
-    var t0 = platform(68, 6, 3);                                          // the bonfire terrace (road ends on its north edge)
-    k.rect(cx - 2, t0.y1, 5, 1, WALL);                                    // closed to the south
-    k.rect(t0.x0 + 1, t0.y0 + 2, t0.x1 - t0.x0 - 1, t0.y1 - t0.y0 - 2, GROUND); // the road stops at the terrace's north edge; the fire sits mid-terrace
-    var l1 = platform(49, 5, 3), l2 = platform(30, 5, 3);
+    var t0 = landing(68, 6, 3);
+    k.rect(cx - 2, t0.y1, 5, 1, WALL);
+    k.rect(t0.x0 + 1, t0.y0 + 2, t0.x1 - t0.x0 - 1, t0.y1 - t0.y0 - 2, GROUND);
+    var l1 = landing(49, 5, 3), l2 = landing(30, 5, 3);
     road(l1.y1 + 1, t0.y0 - 1); road(l2.y1 + 1, l1.y0 - 1); road(15, l2.y0 - 1);
     var boss = bossRoom(k, cx - 8, 3, 17, 11, 'S');
     k.rect(cx - 2, 15, 5, 3, PATH);
-    // braziers on the parapets, every four rows, mirrored; and on each landing's four corners
     [[l1.y1 + 2, t0.y0 - 2], [l2.y1 + 2, l1.y0 - 2], [16, l2.y0 - 2]].forEach(function (seg) { for (y = seg[0]; y <= seg[1]; y += 4) braziers.push({ x: cx - 3, y: y }, { x: cx + 3, y: y }); });
     [t0, l1, l2].forEach(function (P) { braziers.push({ x: P.x0, y: P.y0 }, { x: P.x1, y: P.y0 }); if (P !== t0) braziers.push({ x: P.x0, y: P.y1 }, { x: P.x1, y: P.y1 }); });
-    // hand-placed scenery (prop index into the land's set; mirrored pairs): 0 pillar, 1 kneeling scholar, 2 crowned head,
-    // 3 banner, 4 crowns and scrolls, 5 obelisk, 6 lectern, 7 bones
-    function pair(i, dx, y, flatOnGround) { props.push({ i: i, x: cx - dx, y: y, flip: false, flat: !!flatOnGround }, { i: i, x: cx + dx, y: y, flip: true, flat: !!flatOnGround }); }
-    pair(0, 7, 2); pair(0, 4, 2); pair(3, 2, 2);                          // throne room: pillars and banners on the north wall
-    pair(5, 8, 13); pair(4, 3, 6, true); pair(7, 6, 10, true);            // obelisks at the south corners, crowns and bones on the floor
-    pair(1, 6, l1.y0); pair(1, 6, l2.y0);                                 // kneeling scholars on the landings' north parapets
-    pair(6, 4, l1.y0 + 2, true); pair(6, 4, l2.y0 + 2, true);             // lecterns on the landings
-    pair(5, 6, t0.y0); pair(2, 4, t0.y0 + 2, true);                       // obelisks over the terrace, a fallen crowned head either side
     braziers.forEach(function (p) { if (k.get(p.x, p.y) !== WALL) k.set(p.x, p.y, GROUND); });
-    return { name: 'the processional', spawn: fire, bossRoom: boss, bare: true, fillPockets: true, braziers: braziers, props: props,
+    return { name: 'the mountain road', spawn: fire, bossRoom: boss, bare: true, fillPockets: true, braziers: braziers, props: [],
       areas: [{ x: cx, y: 49, rx: 2, tier: 'BEG' }, { x: cx, y: 30, rx: 2, tier: 'PRG' }], key: null, nooks: [] };
   };
 
@@ -670,7 +552,7 @@ var LandMaps = (function () {
       key: { x: 22, y: 30 }, nooks: [{ x: 5, y: 13 }, { x: 13, y: 13 }] };
   };
 
-  var SIZES = { T0: [48, 36], L11: [45, 76], L1: [84, 56], L2: [84, 60], L3: [76, 76], L4: [84, 62], L5: [86, 62], L6: [64, 78], L7: [76, 72], L8: [96, 62], L9: [78, 78], L10: [100, 66] };
+  var SIZES = { T0: [48, 36], L1: [84, 56], L2: [84, 60], L3: [76, 76], L4: [84, 62], L5: [86, 62], L6: [64, 78], L7: [80, 64], L8: [96, 64], L9: [45, 76] };
 
   function build(L, env) {
     var bpf = BP[L.id]; if (!bpf) return null;

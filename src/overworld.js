@@ -26,11 +26,9 @@ var Overworld = (function () {
     L4: { name: 'mines', ground: ['#2a2826', '#252321'], path: '#4a3f33', wall: 'rock', water: '#14222c', deco: ['rock-small', 'bones'], wallDensity: 0.34, waterDensity: 0.04, indoor: true },
     L5: { name: 'ruin', ground: ['#3a342c', '#342e27'], path: '#5a4e3c', wall: 'wall', water: '#2a3a3c', deco: ['rock-small', 'bones'], wallDensity: 0.34, waterDensity: 0.04 },
     L6: { name: 'stair', ground: ['#4a4c50', '#44464a'], path: '#6a6458', wall: 'rock', water: '#2a4a5c', deco: ['rock-small', 'bones'], wallDensity: 0.34, waterDensity: 0.04 },
-    L7: { name: 'thorn', ground: ['#34301f', '#2e2a1c'], path: '#5a4e34', wall: 'tree', water: '#1f3340', deco: ['stump', 'rock-small'], wallDensity: 0.36, waterDensity: 0.03 },
-    L8: { name: 'citadel', ground: ['#2e2c2a', '#292725'], path: '#4a4640', wall: 'wall', water: '#14181e', deco: ['rock-small', 'bones'], wallDensity: 0.34, waterDensity: 0.04 },
-    L9: { name: 'spire', ground: ['#2a2a32', '#25252d'], path: '#46444e', wall: 'rock', water: '#151a28', deco: ['rock-small', 'bones'], wallDensity: 0.34, waterDensity: 0.05 },
-    L11: { name: 'throne', ground: ['#2a2230', '#251e2b'], path: '#4a4050', wall: 'rock', water: '#b8441e', deco: ['ember', 'bones'], wallDensity: 0.3, waterDensity: 0.1, lava: true, decoP: 0.03 },
-    L10: { name: 'frost', ground: ['#3a4048', '#343a42'], path: '#5a6068', wall: 'rock', water: '#2a4458', deco: ['rock-small', 'bones'], wallDensity: 0.32, waterDensity: 0.1 },
+    L7: { name: 'hills', ground: ['#3a4a2c', '#344428'], path: '#6a5e40', wall: 'tree', water: '#2a4a5c', deco: ['rock-small', 'stump'], wallDensity: 0.34, waterDensity: 0.04 },
+    L8: { name: 'cross', ground: ['#4a4236', '#443c31'], path: '#6a5c44', wall: 'wall', water: '#2a3a44', deco: ['rock-small', 'bones'], wallDensity: 0.34, waterDensity: 0.03 },
+    L9: { name: 'gate', ground: ['#3c3e48', '#373942'], path: '#5c5a64', wall: 'rock', water: '#8a96aa', deco: ['rock-small'], wallDensity: 0.3, waterDensity: 0.1, vista: true, decoP: 0.02 },
     def: { name: 'wild', ground: ['#2e342c', '#293026'], path: '#4a4030', wall: 'tree', water: '#1b2b3a', deco: ['rock-small', 'bones'], wallDensity: 0.3, waterDensity: 0.05 }
   };
   THEMES.T0 = THEMES.L1;
@@ -296,7 +294,7 @@ var Overworld = (function () {
     var kindled = false;
     if (w.campfire && !walkable(map, w.campfire.x, w.campfire.y)) delete w.campfire;
     if (ret && ret.isBoss && ret.outcome === 'won' && !w.campfire) { var cf = campSpot(map, start, well); if (cf) { w.campfire = cf; kindled = true; } }
-    var vista = !!(map.theme && map.theme.name === 'throne'); if (vista) for (var si = 0; si < seen.length; si++) seen[si] = 1; // the processional is in view from the first step
+    var vista = !!(map.theme && (map.theme.vista || map.theme.name === 'throne')); if (vista) for (var si = 0; si < seen.length; si++) seen[si] = 1; // the processional is in view from the first step
     var braz = {}, brazOK = !!(SP.actor && SP.actor('cr:brazier')); if (brazOK) (map.braziers || []).forEach(function (b) { braz[b.y * map.w + b.x] = 1; });
     (map.props || []).forEach(function (q) { if (!q.flat) braz[q.y * map.w + q.x] = 1; }); // tall scenery is solid
     if (w.campfire) braz[w.campfire.y * map.w + w.campfire.x] = 1;

@@ -5,8 +5,8 @@ import sys, json, io
 import numpy as np, cv2
 from PIL import Image, ImageFilter, ImageEnhance
 SRC, LAB = sys.argv[1], sys.argv[2]; S = 1.5
-NAMES = {'L1': 'The Hollow Fields', 'L2': 'The Salt Wastes', 'L3': 'The Deep Quarry', 'L4': 'The Hollowdeep Mines', 'L5': "Cogwright's Ruin", 'L6': 'The Sheer Stair', 'L7': 'The Waystone Hills', 'L8': 'The Crossroads'}
-LABEL_AT = {'L1': (1330, 580), 'L2': (1110, 600), 'L3': (950, 400), 'L4': (800, 640), 'L5': (580, 430), 'L6': (480, 620), 'L7': (200, 520), 'L8': (260, 330)}
+NAMES = {'L1': 'The Hollow Fields', 'L2': 'The Salt Wastes', 'L3': 'The Deep Quarry', 'L4': 'The Hollowdeep Mines', 'L5': "Cogwright's Ruin", 'L6': 'The Sheer Stair', 'L7': 'The Waystone Hills', 'L8': 'The Crossroads', 'L9': 'The Gate of Lorebound'}
+LABEL_AT = {'L1': (1330, 580), 'L2': (1110, 600), 'L3': (950, 400), 'L4': (800, 640), 'L5': (580, 430), 'L6': (480, 620), 'L7': (200, 520), 'L8': (260, 330), 'L9': (150, 56)}
 im = Image.open(SRC).convert('RGB'); W, H = round(im.width * S), round(im.height * S); im = im.resize((W, H), Image.LANCZOS)
 lab0 = cv2.imread(LAB, cv2.IMREAD_GRAYSCALE)
 try:   # hand patches (tools/map_patches.json): unclaimed painting a land should own, e.g. a peak or a stair landing the segmentation missed

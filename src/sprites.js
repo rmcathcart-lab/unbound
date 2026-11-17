@@ -171,8 +171,8 @@
   };
 
   /* ---------- painted terrain per land (tools/pack_terrain.py) ---------- */
-  var TSET = { marsh: 'L1', salt: 'L2', quarry: 'L3', mines: 'L4', ruin: 'L5', stair: 'L6', hills: 'L7', cross: 'L8', gate: 'L6' }, terr = {};
-  var TTINT = { gate: 'rgba(170,190,230,0.18)' }; // a land without its own set can borrow one, recoloured: { theme: 'rgba(...)' }
+  var TSET = { marsh: 'L1', salt: 'L2', quarry: 'L3', mines: 'L4', ruin: 'L5', stair: 'L6', hills: 'L7', cross: 'L8', gate: 'L9' }, terr = {};
+  var TTINT = {}; // a land without its own set can borrow one, recoloured: { theme: 'rgba(...)' }
   SP.q = 'high'; // image smoothing quality for painted art; the overworld lowers it on slow devices
   SP.terrainReady = function (name) { return !!terrainFor(name); };
   /* a soft round glow, drawn once and reused (radial gradients rebuilt every frame are costly on slow devices) */

@@ -529,7 +529,13 @@ var LandMaps = (function () {
     [[l1.y1 + 2, t0.y0 - 2], [l2.y1 + 2, l1.y0 - 2], [16, l2.y0 - 2]].forEach(function (seg) { for (y = seg[0]; y <= seg[1]; y += 4) braziers.push({ x: cx - 3, y: y }, { x: cx + 3, y: y }); });
     [t0, l1, l2].forEach(function (P) { braziers.push({ x: P.x0, y: P.y0 }, { x: P.x1, y: P.y0 }); if (P !== t0) braziers.push({ x: P.x0, y: P.y1 }, { x: P.x1, y: P.y1 }); });
     braziers.forEach(function (p) { if (k.get(p.x, p.y) !== WALL) k.set(p.x, p.y, GROUND); });
-    return { name: 'the mountain road', spawn: fire, bossRoom: boss, bare: true, fillPockets: true, braziers: braziers, props: [],
+    // hand-placed scenery from the Gate's own set (0 brazier, 1 broken pillar, 2 guardian statue, 3 snowy boulders,
+    // 4 banner pole, 5 stone altar, 6 frozen dead tree, 7 lantern post), mirrored across the road
+    var props = [];
+    function pair(i, dx, y) { props.push({ i: i, x: cx - dx, y: y, flip: false }, { i: i, x: cx + dx, y: y, flip: true }); }
+    pair(1, 5, 66); pair(6, 4, 70); pair(2, 4, 47); pair(3, 4, 51); pair(2, 4, 28); pair(4, 4, 32);
+    props = props.filter(function (q) { return k.get(q.x, q.y) === GROUND && !braziers.some(function (b) { return b.x === q.x && b.y === q.y; }); });
+    return { name: 'the mountain road', spawn: fire, bossRoom: boss, bare: true, fillPockets: true, braziers: braziers, props: props,
       areas: [{ x: cx, y: 49, rx: 2, tier: 'BEG' }, { x: cx, y: 30, rx: 2, tier: 'PRG' }], key: null, nooks: [] };
   };
 

@@ -11462,9 +11462,15 @@ var Overworld = (function () {
       go('ledger');
     });
   }
-  function ledgerClasses() { var out = []; (LG.data.players || []).forEach(function (p) { if (out.indexOf(p['class']) < 0) out.push(p['class']); }); return out.sort(); }
+  function lgNorm(c) { return String(c == null ? '' : c).trim().toLowerCase().replace(/\s+/g, ' '); }
+  function ledgerClasses() { // every class code the teacher has set up, plus any class a student has played under
+    var out = [];
+    function add(c) { c = lgNorm(c); if (c && out.indexOf(c) < 0) out.push(c); }
+    (LG.data.classes || []).forEach(add); (LG.data.players || []).forEach(function (p) { add(p['class']); });
+    return out.sort();
+  }
   function ledgerPlayers(all) { // the chosen class (all = ignore the search box), sorted as the table asks
-    var list = (LG.data.players || []).filter(function (p) { return (!LG.klass || p['class'] === LG.klass) && (all || !LG.q || (String(p.name) + ' ' + String(p.hero || '')).toLowerCase().indexOf(LG.q.toLowerCase()) >= 0); });
+    var list = (LG.data.players || []).filter(function (p) { return (!LG.klass || lgNorm(p['class']) === LG.klass) && (all || !LG.q || (String(p.name) + ' ' + String(p.hero || '')).toLowerCase().indexOf(LG.q.toLowerCase()) >= 0); });
     var k = LG.sort, dir = LG.dir;
     function v(p) { if (k === 'accuracy') return acc(p); if (k === 'lands') return lgLands().reduce(function (s, L) { return s + (cleared(p, L) ? 2 : reached(p, L) ? 1 : 0); }, 0); return p[k]; }
     list.sort(function (a, b) { var va = v(a), vb = v(b); if (typeof va === 'string' || typeof vb === 'string') return String(va || '').localeCompare(String(vb || '')) * dir; return ((va == null ? -1 : Number(va) || 0) - (vb == null ? -1 : Number(vb) || 0)) * dir; });
@@ -11741,7 +11747,7 @@ var Overworld = (function () {
   function xpRows(what) { // [{key, name, num, info, grade}] for the chosen class
     var ch = xpChoices().filter(function (c) { return c.id === what; })[0] || xpChoices()[0], map = psMap()[normClass(LG.klass)] || {}, numOf = {};
     Object.keys(map).forEach(function (num) { numOf[map[num]] = num; });
-    return (LG.data.players || []).filter(function (p) { return p['class'] === LG.klass; }).map(function (p) {
+    return (LG.data.players || []).filter(function (p) { return lgNorm(p['class']) === LG.klass; }).map(function (p) {
       var r = { key: p.key, name: p.name, num: numOf[p.key] || '', info: '', grade: '' };
       if (ch.oc) { var b = bestLevel(pOut(p), ch.oc), tr = triesOn(pOut(p), [ch.oc]); r.info = tr.a ? tr.c + ' of ' + tr.a + ' right' : 'no answers'; r.grade = b === 'MAS' || b === 'PRG' || b === 'BEG' ? b : tr.a ? 'NM' : ''; }
       else { var t = triesOn(pOut(p), landOutcomes(ch.land)); r.pct = t.a ? t.c / t.a : null; r.info = t.a ? Math.round(1000 * t.c / t.a) / 10 + '% of ' + t.a : 'no answers'; r.grade = band(r.pct); }
